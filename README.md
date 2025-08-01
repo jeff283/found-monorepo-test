@@ -2,6 +2,53 @@
 
 This Turborepo starter is maintained by the Turborepo core team.
 
+## Getting Started with pnpm
+
+This monorepo uses [pnpm](https://pnpm.io/) as the package manager. You need to install it globally before working with the repo.
+
+### Installing pnpm
+
+You can install pnpm globally using npm:
+
+```sh
+npm install -g pnpm
+```
+
+Or follow the official instructions at [https://pnpm.io/installation](https://pnpm.io/installation).
+
+### Common pnpm Commands
+
+- **Install dependencies for the whole monorepo:**
+  ```sh
+  pnpm install
+  ```
+- **Run a dev server for a specific app (e.g., `web`):**
+  ```sh
+  pnpm --filter web dev
+  ```
+- **Build a specific app (e.g., `docs`):**
+  ```sh
+  pnpm --filter docs build
+  ```
+- **Add a new package to an app (e.g., add `axios` to `web-app`):**
+  ```sh
+  pnpm --filter web-app add axios
+  ```
+- **Remove a package from an app:**
+  ```sh
+  pnpm --filter web-app remove axios
+  ```
+
+### Working on Specific Parts of the Monorepo
+
+- To run, build, or test a specific app or package, use the `--filter` flag with the name of the app/package.
+  - Example: `pnpm --filter api test`
+- You can also run scripts defined in each app's `package.json` using the same filter approach.
+
+### Turborepo Remote Caching (Optional)
+
+To speed up builds and CI, you can enable [Turborepo Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching). See the [Turbo docs](https://turbo.build/repo/docs/core-concepts/remote-caching) for setup instructions. This is optional but recommended for teams.
+
 ## Using this example
 
 Run the following command:
