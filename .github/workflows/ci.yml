@@ -11,6 +11,10 @@ jobs:
     name: Lint and Build OpenNext
     runs-on: ubuntu-latest
 
+    env:
+      CLERK_API_KEY: ${{ secrets.CLERK_API_KEY }}
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
