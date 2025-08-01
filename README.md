@@ -1,6 +1,25 @@
-# Turborepo Tailwind CSS starter
+# Foundly Monorepo
 
-This Turborepo starter is maintained by the Turborepo core team.
+Welcome to the Foundly monorepo! This repository contains all the core code for Foundly, including the marketing website, main application, and backend API.
+
+Learn more at [foundlyhq.com](https://foundlyhq.com/)
+
+For LLM and AI-related info, see [foundlyhq.com/llms.txt](https://foundlyhq.com/llms.txt)
+
+## Repository Structure
+
+The main projects in this monorepo are:
+
+- `website`: The marketing website for Foundly ([Next.js](https://nextjs.org/))
+- `web-app`: The main Foundly application ([Next.js](https://nextjs.org/))
+- `api`: The backend API for Foundly ([Hono](https://hono.dev/))
+
+There are also two starter/example apps for experimentation and learning:
+
+- `docs`: Example Next.js app with Tailwind CSS (for learning/messing around)
+- `web`: Another example Next.js app with Tailwind CSS (for learning/messing around)
+
+Other packages include shared UI components, TypeScript configs, and ESLint configs.
 
 ## Getting Started with pnpm
 
@@ -19,17 +38,19 @@ Or follow the official instructions at [https://pnpm.io/installation](https://pn
 ### Common pnpm Commands
 
 - **Install dependencies for the whole monorepo:**
+
   ```sh
   pnpm install
   ```
-- **Run a dev server for a specific app (e.g., `web`):**
-  ```sh
-  pnpm --filter web dev
-  ```
-- **Build a specific app (e.g., `docs`):**
-  ```sh
-  pnpm --filter docs build
-  ```
+
+- **Run a dev server for a specific app:**
+  - Marketing website: `pnpm --filter website dev`
+  - Main app: `pnpm --filter web-app dev`
+  - API: `pnpm --filter api dev`
+- **Build a specific app:**
+  - Marketing website: `pnpm --filter website build`
+  - Main app: `pnpm --filter web-app build`
+  - API: `pnpm --filter api build`
 - **Add a new package to an app (e.g., add `axios` to `web-app`):**
   ```sh
   pnpm --filter web-app add axios
@@ -44,32 +65,29 @@ Or follow the official instructions at [https://pnpm.io/installation](https://pn
 - To run, build, or test a specific app or package, use the `--filter` flag with the name of the app/package.
   - Example: `pnpm --filter api test`
 - You can also run scripts defined in each app's `package.json` using the same filter approach.
+- The main apps you will work on are `website`, `web-app`, and `api`.
 
 ### Turborepo Remote Caching (Optional)
 
 To speed up builds and CI, you can enable [Turborepo Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching). See the [Turbo docs](https://turbo.build/repo/docs/core-concepts/remote-caching) for setup instructions. This is optional but recommended for teams.
 
-## Using this example
+## Using the Example Apps
 
-Run the following command:
-
-```sh
-npx create-turbo@latest -e with-tailwind
-```
+The `docs` and `web` folders are example Next.js apps included for learning and experimentation. You can use them to try out new ideas or test features without affecting the main Foundly apps.
 
 ## What's inside?
 
-This Turborepo includes the following packages/apps:
+This monorepo includes:
 
-### Apps and Packages
+- `website`: Foundly marketing website (Next.js)
+- `web-app`: Main Foundly application (Next.js)
+- `api`: Foundly backend API (Hono)
+- `docs` and `web`: Example/learning apps (Next.js)
+- `ui`: Shared React component library (used by main apps)
+- `@repo/eslint-config`: Shared ESLint config
+- `@repo/typescript-config`: Shared TypeScript config
 
-- `docs`: a [Next.js](https://nextjs.org/) app with [Tailwind CSS](https://tailwindcss.com/)
-- `web`: another [Next.js](https://nextjs.org/) app with [Tailwind CSS](https://tailwindcss.com/)
-- `ui`: a stub React component library with [Tailwind CSS](https://tailwindcss.com/) shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+All apps and packages use [TypeScript](https://www.typescriptlang.org/).
 
 ### Building packages/ui
 
