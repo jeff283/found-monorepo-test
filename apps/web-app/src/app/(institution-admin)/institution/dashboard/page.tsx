@@ -1,0 +1,232 @@
+
+// Example backend usage for StatsCards:
+// import { useEffect, useState } from 'react';
+// import { StatsCards } from '@/components/common/stats-cards';
+// import { FileText, Search, Users, Lightbulb } from 'lucide-react';
+//
+// const [stats, setStats] = useState([]);
+// useEffect(() => {
+//   fetch('/api/dashboard/stats')
+//     .then((res) => res.json())
+//     .then((data) => {
+//       const transformedStats = [
+//         { title: 'Lost Reports', value: data.lost_reports, change: data.lost_reports_change, period: 'This month', icon: FileText },
+//         { title: 'Items Found', value: data.items_found, change: data.items_found_change, period: 'This month', icon: Search },
+//         { title: 'Items Matched', value: data.items_matched, change: data.items_matched_change, period: 'This month', icon: Users },
+//         { title: 'Match Suggestions', value: data.match_suggestions, change: data.match_suggestions_change, period: 'This month', icon: Lightbulb },
+//       ];
+//       setStats(transformedStats);
+//     });
+// }, []);
+//
+// <StatsCards stats={stats} compact />
+
+
+'use client';
+
+import { DashboardHeader } from "@/components/institution-dashboard/dashboard-header";
+import { WelcomeSection } from "@/components/institution-dashboard/welcome-section";
+import { StatsCards } from "@/components/common/stats-cards";
+import { LiveAlerts } from "@/components/institution-dashboard/live-alerts";
+import { ItemStatusChart } from "@/components/institution-dashboard/item-status-chart";
+import { ItemsChart } from "@/components/institution-dashboard/items-chart";
+import { LatestFindsTable } from "@/components/institution-dashboard/latest-finds-table";
+import { FileText, Search, Users, Lightbulb } from "lucide-react";
+import type { Alert } from "@/components/institution-dashboard/live-alerts";
+
+export default function Dashboard() {
+ 
+  // import { useEffect, useState } from "react";
+  // const [alerts, setAlerts] = useState<Alert[]>([]);
+  // useEffect(() => {
+  //   fetch("/api/dashboard/alerts")
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       const transformedAlerts: Alert[] = data.map((item: any) => ({
+  //         id: item.id,
+  //         title: item.title,
+  //         description: item.description,
+  //         type: item.type,
+  //       }));
+  //       setAlerts(transformedAlerts);
+  //     });
+  // }, []);
+
+// alert object includes a type property with one of these values ("found", "report", or "match"). 
+// The component will automatically display the correct icon for each alert type.
+
+
+ 
+  // import { useEffect, useState } from "react";
+  // const [stats, setStats] = useState([]);
+  // useEffect(() => {
+  //   fetch("/api/dashboard/stats")
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       const transformedStats = [
+  //         {
+  //           title: "Lost Reports",
+  //           value: data.lost_reports,
+  //           change: data.lost_reports_change,
+  //           period: "This month",
+  //           icon: FileText,
+  //         },
+  //         {
+  //           title: "Items Found",
+  //           value: data.items_found,
+
+  const user = {
+    name: "John Snow",
+    role: "Admin",
+    avatar: "/avatars/avatar-1.webp", 
+  };
+
+  const stats = [
+    {
+      title: "Lost Reports",
+      value: "+240",
+      change: "+30",
+      period: "Last month",
+      icon: FileText,
+    },
+    {
+      title: "Items Found",
+      value: "+180",
+      change: "+20",
+      period: "Last month",
+      icon: Search,
+    },
+    {
+      title: "Items Matched",
+      value: "+120",
+      change: "+10",
+      period: "Last month",
+      icon: Users,
+    },
+    {
+      title: "Match Suggestions",
+      value: "+80",
+      change: "+15",
+      period: "Last month",
+      icon: Lightbulb,
+    },
+  ];
+
+  const alerts: Alert[] = [
+    {
+      id: "1042",
+      title: "Item #1042",
+      description: "Black Backpack found at Lobby",
+      type: "found",
+    },
+    {
+      id: "913",
+      title: "Lost Report #913 submitted",
+      description: "Lost Phone",
+      type: "report",
+    },
+    {
+      id: "match",
+      title: "Suggested Match",
+      description: "#1041 → Report #912 (94%)",
+      type: "match",
+    },
+  ];
+
+  return (
+    <div className="min-h-screen bg-white w-full">
+      <DashboardHeader user={user} />
+
+      <main className="max-w-7xl mx-auto p-2 w-full">
+        <WelcomeSection userName="Reyes" />
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2 w-full">
+          <StatsCards stats={stats} compact />
+          <LiveAlerts alerts={alerts} compact />
+          <ItemStatusChart compact />
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-4 w-full">
+          <div className="w-full lg:w-1/2">
+            <ItemsChart
+              compact
+            monthlyData={[
+                { name: "Jan", last: 40, current: 40 },
+                { name: "Feb", last: 45, current: 70 }, 
+                { name: "Mar", last: 35, current: 140 }, 
+                { name: "Apr", last: 50, current: 70 }, 
+                { name: "May", last: 40, current: 50 }, 
+                { name: "Jun", last: 55, current: 60 }, 
+                { name: "Jul", last: 60, current: 50 }, 
+                { name: "Aug", last: 50, current: 65 }, 
+              ]}
+              weeklyData={[
+                { name: "Week 1", last: 100, current: 50 },
+                { name: "Week 2", last: 60, current: 150 },
+                { name: "Week 3", last: 140, current: 100 },
+                { name: "Week 4", last: 40, current: 80 },
+              ]}
+              dailyData={[
+                { name: "Mon", last: 130, current: 30 },
+                { name: "Tue", last: 50, current: 190 },
+                { name: "Wed", last: 100, current: 130 },
+                { name: "Thu", last: 65, current: 250 },
+                { name: "Fri", last: 100, current: 170 },
+                { name: "Sat", last: 190, current: 80 },
+                { name: "Sun", last: 8, current: 50 },
+              ]}
+            />
+          </div>
+          <div className="w-full lg:w-1/2">
+            <LatestFindsTable compact />
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
+
+ // const [findItems, setFindItems] = useState<FindItem[]>([]);
+  // useEffect(() => {
+  //   fetch("/api/dashboard/latest-finds")
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       const transformedItems: FindItem[] = data.map((item: any) => ({
+  //         id: item.id,
+  //         description: item.description,
+  //         date: item.date,
+  //         time: item.time,
+  //         location: item.location,
+  //         status: item.status,
+  //       }));
+  //       setFindItems(transformedItems);
+  //     });
+  // }, []);
+
+
+
+// const [monthlyData, setMonthlyData] = useState([]);
+// const [weeklyData, setWeeklyData] = useState([]);
+// const [dailyData, setDailyData] = useState([]);
+
+// useEffect(() => {
+//   fetch("/api/dashboard/items-chart")
+//     .then((res) => res.json())
+//     .then((data) => {
+//       setMonthlyData(data.monthly.map((item: any) => ({
+//         name: item.name,
+//         last: item.last,
+//         current: item.current,
+//       })));
+//       setWeeklyData(data.weekly.map((item: any) => ({
+//         name: item.name,
+//         last: item.last,
+//         current: item.current,
+//       })));
+//       setDailyData(data.daily.map((item: any) => ({
+//         name: item.name,
+//         last: item.last,
+//         current: item.current,
+//       })));
+//     });
+// }, []);

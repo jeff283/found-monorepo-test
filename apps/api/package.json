@@ -1,0 +1,32 @@
+{
+  "name": "foundly-api",
+  "type": "module",
+  "scripts": {
+    "test": "vitest",
+    "test:run": "vitest --run",
+    "test:unit": "vitest --project unit --run",
+    "test:unit:watch": "vitest --project unit --watch",
+    "test:int": "vitest --project integration --run",
+    "test:int:watch": "vitest --project integration --watch",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy --minify --keep-vars",
+    "deploy:prod": "wrangler deploy --minify --env production",
+    "deploy:preview": "wrangler deploy --minify --env preview",
+    "deploy:staging": "wrangler deploy --minify --env staging",
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
+  },
+  "dependencies": {
+    "@clerk/backend": "^2.6.2",
+    "@hono/clerk-auth": "^3.0.3",
+    "hono": "^4.8.10",
+    "zod": "^4.0.14"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.8.59",
+    "@cloudflare/workers-types": "^4.20250801.0",
+    "@types/node": "^24.1.0",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.2.4",
+    "wrangler": "^4.27.0"
+  }
+}

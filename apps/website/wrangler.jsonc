@@ -1,0 +1,44 @@
+{
+  "main": ".open-next/worker.js",
+  "name": "foundly-main-website",
+  "compatibility_date": "2025-03-25",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+  // "routes": [
+  //   {
+  //     "pattern": "foundlyhq.com",
+  //     "custom_domain": true
+  //   }
+  // ],
+  "env": {
+    "preview": {
+      "name": "foundly-website-preview",
+      "workers_dev": true
+    },
+    "staging": {
+      "name": "foundly-website-staging",
+      "routes": [
+        {
+          "pattern": "staging.dev.foundlyhq.com",
+          "custom_domain": true
+        }
+      ]
+    },
+    "production": {
+      "name": "foundly-main-website",
+      "routes": [
+        {
+          "pattern": "foundlyhq.com",
+          "custom_domain": true
+        }
+      ]
+    }
+  }
+}

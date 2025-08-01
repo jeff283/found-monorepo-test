@@ -1,0 +1,131 @@
+# Foundly Website: LLMs Context Guide
+
+## Overview
+Foundly is a digital platform designed to modernize and optimize the lost & found process for both individuals and institutions (such as schools, hotels, offices, and other organizations). It leverages AI-powered matching, real-time alerts, and intuitive dashboards to connect people with their lost belongings efficiently and securely.
+
+---
+
+## Platform Purpose & Audience
+- **For Individuals:** Enables users to report lost or found items, receive smart match suggestions, and communicate securely.
+- **For Institutions:** Provides tools for staff to manage, match, and resolve item reports at their locations, with admin dashboards and recordkeeping.
+
+---
+
+## Core Features
+- **AI Matching:**
+  - Uses advanced machine learning to analyze item descriptions, photos, and location data.
+  - Identifies potential matches even with vague or incomplete descriptions.
+- **Real-Time Alerts:**
+  - Notifies users and admins about potential matches and updates.
+- **Mobile-First Access:**
+  - Designed for accessibility and ease of use on mobile devices.
+- **Privacy & Security:**
+  - All personal data is encrypted and only accessible to authorized users.
+  - Adheres to strict data protection standards.
+- **Intuitive Dashboards:**
+  - For both individuals and institutions to track, manage, and resolve cases.
+
+---
+
+## Frequently Asked Questions (FAQ) Summary
+- **How does Foundly’s AI matching work?**
+  - Machine learning analyzes item details and context to suggest matches.
+- **Who can use Foundly?**
+  - Both individuals and institutions.
+- **How secure is my information?**
+  - Data is encrypted, access is restricted, and privacy is a top priority.
+- **What makes Foundly different?**
+  - AI-powered matching, automation, real-time alerts, and a modern, user-friendly interface.
+- **When is Foundly available?**
+  - In development with pilot testing; public launch planned soon.
+
+---
+
+## Terms of Service (Key Points)
+- **User Responsibilities:**
+  - Submit honest, accurate reports with real photos and truthful details.
+  - Misuse or abuse (e.g., false claims) can result in account deactivation.
+- **Institutional Use:**
+  - Staff can manage and resolve reports at their locations, following local privacy rules.
+- **Foundly’s Role:**
+  - Acts as a digital facilitator; does not physically hold or deliver items.
+- **Data Use:**
+  - Logs actions for security and traceability; may remove reports violating terms.
+- **Fair Use:**
+  - No spamming, harassment, or data scraping; platform is for genuine lost & found help.
+
+---
+
+## Privacy Policy (Key Points)
+- **Data Collected:**
+  - Item reports (details, photos, location, time)
+  - Contact info (e.g., email)
+  - Login credentials (Google, school/work accounts)
+  - Admin actions (matching, editing, resolving)
+- **Purpose of Data Collection:**
+  - To facilitate item recovery, improve matching, and provide management tools.
+  - Anonymized trends may be shared with partners.
+- **Data Access:**
+  - Only admins at relevant locations and Foundly support (when necessary).
+  - Data is never sold.
+- **Data Retention:**
+  - Reports stored up to 180 days (or less if deleted by institution); permanent deletion within 30 days of removal.
+- **Security:**
+  - Encrypted storage, secure servers, industry-standard practices.
+  - Users can request data deletion via support email.
+
+---
+
+## Claim Verification Policy
+- **Step 1: Claim Submission**
+  - User submits a claim with a photo, contact info, and details (time, date, location).
+- **Step 2: Admin Review**
+  - Admins compare claim details with records (description, metadata, unique identifiers).
+- **Step 3: Verification Questions**
+  - If unclear, admins may request proof of purchase, a selfie with the item, or unique codes (e.g., serial number).
+- **Step 4: Final Decision**
+  - Admins make the final call; Foundly does not override local policies. Disputes are logged.
+- **Step 5: Archive & Recordkeeping**
+  - Closed cases are archived with time, resolver, and supporting notes for future reference.
+
+---
+
+## Liability Disclaimers
+- **Foundly is a Digital Tool:**
+  - Does not physically hold, transport, or inspect items; only facilitates connections.
+- **No Guarantee of Recovery:**
+  - Matches depend on user-provided info and admin verification; not all items are guaranteed to be found or returned.
+- **Admin Discretion:**
+  - Institutions make final decisions; Foundly does not intervene in disputes or override local protocols.
+- **Not Responsible for Incorrect Returns:**
+  - Responsibility for verifying ownership lies with the institution or individual returning the item.
+- **Use at Your Own Risk:**
+  - Users acknowledge risks inherent in lost & found processes; Foundly prioritizes safety and privacy but cannot control all outcomes.
+
+---
+
+## Contact & Support
+- For questions or concerns, users can email: support@foundly.io
+
+---
+
+## Metadata
+- **Site:** https://foundlyhq.com
+- **Publisher:** Foundly
+- **Social:** @FoundlyHQ (Twitter)
+- **Open Graph Image:** /og-image.png
+
+---
+
+## Site & App Page Links
+- [Home](https://foundlyhq.com/)
+- [Pricing](https://foundlyhq.com/pricing)
+- [Policies (Terms & Privacy)](https://foundlyhq.com/policies)
+- [Application](https://app.foundlyhq.com)
+- [FAQs](https://foundlyhq.com/#faqs)
+
+---
+
+## Principles & Values
+- Transparency, privacy, and user trust are core to Foundly’s mission.
+- The platform is designed to be practical, understandable, and focused on doing the right thing for all users. 
