@@ -35,8 +35,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run build
-        run: pnpm run build
+      - name: Run build (packages only)
+        run: pnpm run build --filter="./packages/*"
 
       - name: Run lint
         run: pnpm run lint
