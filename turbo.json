@@ -22,6 +22,31 @@
     },
     "test:run": {
       "cache": false
+    },
+    "preview": {
+      "dependsOn": ["^build"],
+      "cache": false
+    },
+    "deploy": {
+      "dependsOn": ["^build"],
+      "cache": false
+    },
+    "deploy:prod": {
+      "dependsOn": ["^build"],
+      "cache": false
+    },
+    "deploy:preview": {
+      "dependsOn": ["^build"],
+      "cache": false
+    },
+    "deploy:stage": {
+      "dependsOn": ["^build"],
+      "cache": false
+    },
+
+    "build:opennext": {
+      "dependsOn": ["^build"],
+      "outputs": [".open-next/**"]
     }
   }
 }

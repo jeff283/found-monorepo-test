@@ -13,7 +13,7 @@
     "deploy": "wrangler deploy --minify --keep-vars",
     "deploy:prod": "wrangler deploy --minify --env production",
     "deploy:preview": "wrangler deploy --minify --env preview",
-    "deploy:staging": "wrangler deploy --minify --env staging",
+    "deploy:stage": "wrangler deploy --minify --env staging",
     "cf-typegen": "wrangler types --env-interface CloudflareBindings"
   },
   "dependencies": {

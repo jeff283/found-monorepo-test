@@ -6,6 +6,13 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "check-types": "turbo run check-types",
+    "test": "turbo run test",
+    "preview": "turbo run preview",
+    "deploy": "turbo run deploy",
+    "deploy:prod": "turbo run deploy:prod",
+    "deploy:preview": "turbo run deploy:preview",
+    "deploy:stage": "turbo run deploy:stage",
+    "build:opennext": "turbo run build:opennext",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
