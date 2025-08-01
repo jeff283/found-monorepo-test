@@ -1,7 +1,8 @@
 {
-  "name": "foundly-api",
+  "name": "api",
   "type": "module",
   "scripts": {
+    "build": "wrangler deploy --dry-run",
     "test": "vitest",
     "test:run": "vitest --run",
     "test:unit": "vitest --project unit --run",

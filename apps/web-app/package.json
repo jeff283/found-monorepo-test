@@ -1,12 +1,14 @@
 {
-  "name": "foundly-app",
+  "name": "web-app",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
+    "dev:turbo": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "build:opennext": "opennextjs-cloudflare build",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "deploy-preview": "opennextjs-cloudflare build  && opennextjs-cloudflare deploy -- --env=preview --keep-vars",
