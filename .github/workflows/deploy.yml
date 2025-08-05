@@ -1,16 +1,9 @@
 name: Deploy to Production
 
 on:
-  # Deploy to production when PR is merged to master or direct push to master
+  # Deploy to production when code is pushed to master/main
+  # This includes both direct pushes and merged PRs
   push:
-    branches:
-      - master
-      - main
-
-  # Deploy to production when PR is merged to master/main
-  pull_request:
-    types:
-      - closed
     branches:
       - master
       - main
@@ -18,15 +11,7 @@ on:
 jobs:
   # Build and deploy all apps to production
   deploy-production:
-    # Only run if it's a push to master/main OR a merged PR to master/main
-    if: |
-      (github.event_name == 'push') || 
-      (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
     runs-on: ubuntu-latest
-    # Add concurrency to prevent duplicate deployments
-    concurrency:
-      group: deploy-production-${{ github.ref }}
-      cancel-in-progress: true
 
     permissions:
       contents: read
