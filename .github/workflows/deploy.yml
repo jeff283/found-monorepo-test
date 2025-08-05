@@ -1,12 +1,11 @@
 name: Deploy to Production
 
 on:
-  # Deploy to production when code is pushed to master/main
+  # Deploy to production when code is pushed to master
   # This includes both direct pushes and merged PRs
   push:
     branches:
       - master
-      - main
 
 jobs:
   # Build and deploy all apps to production
