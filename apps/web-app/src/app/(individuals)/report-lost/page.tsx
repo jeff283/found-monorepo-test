@@ -1,28 +1,25 @@
 "use client"
 
 import { useState } from "react"
-import type { StaticImageData } from "next/image"
 import laxLogo from "@/assets/images/logos/Institution Logos/Los Angeles International Airport (LAX).jpeg"
 import uclaLogo from "@/assets/images/logos/Institution Logos/University of California.png"
 import westfieldLogo from "@/assets/images/logos/Institution Logos/Westfield Century City Mall.png"
 import jfkLogo from "@/assets/images/logos/Institution Logos/John F. Kennedy International Airport.png"
 import harvardLogo from "@/assets/images/logos/Institution Logos/Harvard University.png"
 import stanfordLogo from "@/assets/images/logos/Institution Logos/Stanford University.png"
-import itemImg1 from "@/assets/images/logos/Items/pexels.jpg"
-import itemImg2 from "@/assets/images/logos/Items/pexels-veeterzy-303383.jpg"
-import itemImg3 from "@/assets/images/logos/Items/pexels-tracy-le-blanc-67789-607812.jpg"
-import itemImg4 from "@/assets/images/logos/Items/pexels-chuck-3587478.jpg"
+import type { StaticImageData } from "next/image"
 import InstitutionSelect from "@/components/report-lost/InstitutionSelect"
 import ReportDetailsForm from "@/components/report-lost/ReportDetailsForm"
 import FoundMatchesList from "@/components/report-lost/FoundMatchesList"
 import SuccessScreen from "@/components/report-lost/SuccessScreen"
 
 interface Institution {
-  id: string
-  name: string
-  address: string
-  logo: string | StaticImageData 
+  id: string;
+  name: string;
+  address: string;
+  logo: string | StaticImageData;
 }
+
 
 interface FoundItem {
   itemName: string
@@ -31,10 +28,8 @@ interface FoundItem {
   date: string
   description: string
   status: string
-  image: StaticImageData
+  matchPercentage: number
 }
-
-
 
 // async function fetchInstitutions() {
 //   const res = await fetch('/api/institutions');
@@ -54,6 +49,20 @@ const institutions: Institution[] = [
   { id: "4", name: "John F. Kennedy International Airport", address: "Queens, NY 11430", logo: jfkLogo },
   { id: "5", name: "Harvard University", address: "Cambridge, MA 02138", logo: harvardLogo },
   { id: "6", name: "Stanford University", address: "450 Serra Mall, Stanford, CA 94305", logo: stanfordLogo },
+  { id: "7", name: "Massachusetts Institute of Technology (MIT)", address: "77 Massachusetts Ave, Cambridge, MA 02139", logo: "" },
+  { id: "8", name: "Yale University", address: "New Haven, CT 06520", logo: "" },
+  { id: "9", name: "Princeton University", address: "Princeton, NJ 08544", logo: "" },
+  { id: "10", name: "Columbia University", address: "116th St & Broadway, New York, NY 10027", logo: "" },
+  { id: "11", name: "University of Chicago", address: "5801 S Ellis Ave, Chicago, IL 60637", logo: "" },
+  { id: "12", name: "University of Pennsylvania", address: "Philadelphia, PA 19104", logo: "" },
+  { id: "13", name: "California Institute of Technology (Caltech)", address: "1200 E California Blvd, Pasadena, CA 91125", logo: "" },
+  { id: "14", name: "Duke University", address: "Durham, NC 27708", logo: "" },
+  { id: "15", name: "Johns Hopkins University", address: "Baltimore, MD 21218", logo: "" },
+  { id: "16", name: "Northwestern University", address: "633 Clark St, Evanston, IL 60208", logo: "" },
+  { id: "17", name: "University of Michigan", address: "500 S State St, Ann Arbor, MI 48109", logo: "" },
+  { id: "18", name: "New York University (NYU)", address: "New York, NY 10003", logo: "" },
+  { id: "19", name: "University of California, Berkeley", address: "Berkeley, CA 94720", logo: "" },
+  { id: "20", name: "Cornell University", address: "Ithaca, NY 14850", logo: "" },
 ]
 
 const categories = ["Electronics", "Clothing", "Documents", "Jewelry", "Keys", "Bags", "Other"]
@@ -84,7 +93,7 @@ const initialFoundItems: FoundItem[] = [
     date: "June 17, 2025",
     description: "MacBook in grey sleeve, has sticker on front",
     status: "On hold at LAX Lost & Found",
-    image: itemImg1,
+    matchPercentage: 92,
   },
   {
     itemName: "MacBook Pro 13-inch (Space Gray)",
@@ -93,7 +102,7 @@ const initialFoundItems: FoundItem[] = [
     date: "June 16, 2025",
     description: "MacBook Pro 13-inch, space gray, small dent on corner",
     status: "Available for pickup",
-    image: itemImg2,
+    matchPercentage: 87,
   },
   {
     itemName: "Apple Laptop (Black Case)",
@@ -102,7 +111,7 @@ const initialFoundItems: FoundItem[] = [
     date: "June 15, 2025",
     description: "Apple laptop with black case, charging cable attached",
     status: "On hold at LAX Lost & Found",
-    image: itemImg3,
+    matchPercentage: 80,
   },
   {
     itemName: "Silver MacBook (Stickers)",
@@ -111,128 +120,80 @@ const initialFoundItems: FoundItem[] = [
     date: "June 14, 2025",
     description: "Silver MacBook with university stickers, slightly used",
     status: "Available for pickup",
-    image: itemImg4,
+    matchPercentage: 75,
   },
-]
-
-
-// async function claimItem(itemNumber: string, referenceId: string) {
-//   const res = await fetch('/api/claim-item', {
-//     method: 'POST',
-//     headers: { 'Content-Type': 'application/json' },
-//     body: JSON.stringify({ itemNumber, referenceId }),
-//   });
-//   if (!res.ok) throw new Error('Failed to claim item');
-//   return res.json();
-// }
-
-// async function rejectItem(itemNumber: string, referenceId: string) {
-//   const res = await fetch('/api/reject-item', {
-//     method: 'POST',
-//     headers: { 'Content-Type': 'application/json' },
-//     body: JSON.stringify({ itemNumber, referenceId }),
-//   });
-//   if (!res.ok) throw new Error('Failed to reject item');
-//   return res.json();
-// }
-
+  {
+    itemName: "HP Laptop (Blue Case)",
+    itemNumber: "LA-490",
+    foundAt: "Terminal 1, Coffee Shop",
+    date: "June 10, 2025",
+    description: "HP laptop in blue case, no stickers",
+    status: "Available for pickup",
+    matchPercentage: 62,
+  },
+];
 export default function ReportLost() {
   const [currentStep, setCurrentStep] = useState<"select-institution" | "report-details" | "found-matches" | "success">(
     "select-institution",
-  )
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedInstitutionName, setSelectedInstitutionName] = useState("")
-  const [referenceId, setReferenceId] = useState("")
-  const [formData, setFormData] = useState({
-    itemName: "",
-    category: "",
-    dateLost: "",
-    locationLastSeen: "",
-    location: "",
-    detailedDescription: "",
-  })
-  const [foundItems, setFoundItems] = useState<FoundItem[]>(initialFoundItems)
-
+  );
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedInstitutionName, setSelectedInstitutionName] = useState("");
+  const [referenceId, setReferenceId] = useState("");
+  const [foundItems, setFoundItems] = useState<FoundItem[]>(initialFoundItems);
 
   const generateReferenceId = () => {
-    const institutionCode = selectedInstitutionName.includes("LAX") ? "LAX" : "USA"
-    const randomNum = Math.floor(Math.random() * 90000) + 10000
-    return `USA-${institutionCode}-${randomNum}`
-  }
+    const institutionCode = selectedInstitutionName.includes("LAX") ? "LAX" : "USA";
+    const randomNum = Math.floor(Math.random() * 90000) + 10000;
+    return `USA-${institutionCode}-${randomNum}`;
+  };
 
   const handleInstitutionSelect = (institutionId: string) => {
-    const institution = institutions.find((inst) => inst.id === institutionId)
-    setSelectedInstitutionName(institution?.name || "")
-    setCurrentStep("report-details")
-  }
+    const institution = institutions.find((inst) => inst.id === institutionId);
+    setSelectedInstitutionName(institution?.name || "");
+    setCurrentStep("report-details");
+  };
 
   const handleBack = () => {
     if (currentStep === "found-matches") {
-      setCurrentStep("report-details")
+      setCurrentStep("report-details");
     } else if (currentStep === "report-details") {
-      setCurrentStep("select-institution")
+      setCurrentStep("select-institution");
     }
-  }
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }))
-  }
-
-  const handleSubmit = () => {
-    console.log("Submitting report:", {
-      institution: selectedInstitutionName,
-      ...formData,
-    })
-    // Simulate finding matches and move to next step
-    setCurrentStep("found-matches")
-  }
+  };
 
   const handleClaimItem = (itemNumber: string) => {
-    console.log("Claiming item:", itemNumber)
-    // Generate reference ID and go to success screen
-    setReferenceId(generateReferenceId())
-    setCurrentStep("success")
-  }
+    console.log("Claiming item:", itemNumber);
+    setReferenceId(generateReferenceId());
+    setCurrentStep("success");
+  };
 
   const handleNotMyItem = (itemNumber: string) => {
-    console.log("Not my item:", itemNumber)
+    console.log("Not my item:", itemNumber);
     setFoundItems((prev) => {
-      const updated = prev.filter((item) => item.itemNumber !== itemNumber)
+      const updated = prev.filter((item) => item.itemNumber !== itemNumber);
       if (updated.length === 0) {
-        setReferenceId(generateReferenceId())
-        setCurrentStep("success")
+        setReferenceId(generateReferenceId());
+        setCurrentStep("success");
       }
-      return updated
-    })
-  }
+      return updated;
+    });
+  };
 
   const handleTrackReport = () => {
-    console.log("Tracking report:", referenceId)
+    console.log("Tracking report:", referenceId);
     // Handle track report logic
-  }
+  };
 
   const handleReportAnother = () => {
-    // Reset form and go back to step 1
-    setFormData({
-      itemName: "",
-      category: "",
-      dateLost: "",
-      locationLastSeen: "",
-      location: "",
-      detailedDescription: "",
-    })
-    setSelectedInstitutionName("")
-    setReferenceId("")
-    setFoundItems(initialFoundItems)
-    setCurrentStep("select-institution")
-  }
+    setSelectedInstitutionName("");
+    setReferenceId("");
+    setFoundItems(initialFoundItems);
+    setCurrentStep("select-institution");
+  };
 
-const handleBackToWebsite = () => {
-  window.location.href = "https://foundlyhq.com";
-}
+  const handleBackToWebsite = () => {
+    window.location.href = "https://foundlyhq.com";
+  };
 
   const ResponsiveWrapper = ({ children }: { children: React.ReactNode }) => (
     <div className="min-h-screen w-full flex items-center justify-center px-2 sm:px-4 md:px-8 py-4 bg-gray-50">
@@ -254,14 +215,32 @@ const handleBackToWebsite = () => {
   }
 
   if (currentStep === "report-details") {
+    // Example: AI/Backend integration for matching
+    // const handleReportSubmit = async (data) => {
+    //   // Send report details to backend/AI API
+    //   const response = await fetch('/api/found-items', {
+    //     method: 'POST',
+    //     headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify(data),
+    //   });
+    //   if (!response.ok) {
+    //     // handle error
+    //     return;
+    //   }
+    //   const matches = await response.json(); // Expecting array of found items with matchPercentage, etc.
+    //   setFoundItems(matches);
+    //   setCurrentStep("found-matches");
+    // };
+
     return (
       <ResponsiveWrapper>
         <ReportDetailsForm
-          formData={formData}
           categories={categories}
-          onInputChange={handleInputChange}
           onBack={handleBack}
-          onSubmit={handleSubmit}
+          // onSubmit={handleReportSubmit} // Uncomment to enable backend/AI integration
+          onSubmit={() => {
+            setCurrentStep("found-matches");
+          }}
         />
       </ResponsiveWrapper>
     );
@@ -292,4 +271,14 @@ const handleBackToWebsite = () => {
       </ResponsiveWrapper>
     );
   }
-}
+    return (
+      <ResponsiveWrapper>
+        <SuccessScreen
+          referenceId={referenceId}
+          onTrackReport={handleTrackReport}
+          onReportAnother={handleReportAnother}
+          onBackToWebsite={handleBackToWebsite}
+        />
+      </ResponsiveWrapper>
+    );
+  }

@@ -4,29 +4,65 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import FoundlyButton from "@/components/authentication/FoundlyButton";
+import { z } from "zod";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-interface ReportDetailsFormProps {
-  formData: {
-    itemName: string;
-    category: string;
-    dateLost: string;
-    locationLastSeen: string;
-    location: string;
-    detailedDescription: string;
-  };
-  categories: string[];
-  onInputChange: (field: string, value: string) => void;
-  onBack: () => void;
-  onSubmit: () => void;
-}
+const reportSchema = z.object({
+  itemName: z.string().min(2, "Item name is required"),
+  category: z.string().min(1, "Category is required"),
+  dateLost: z
+    .string()
+    .min(1, "Date lost is required")
+    .refine(
+      (val) => {
+        if (!val) return false;
+        const inputDate = new Date(val);
+        const today = new Date();
+        // Set time to 00:00:00 for both dates to compare only the date part
+        inputDate.setHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
+        return inputDate <= today;
+      },
+      { message: "Date cannot be in the future" }
+    ),
+  locationLastSeen: z.string().min(2, "Location last seen is required"),
+  location: z.string().min(2, "Location is required"),
+  detailedDescription: z.string().min(5, "Description is required"),
+});
 
-export default function ReportDetailsForm({
-  formData,
-  categories,
-  onInputChange,
-  onBack,
-  onSubmit,
-}: ReportDetailsFormProps) {
+type ReportFormValues = z.infer<typeof reportSchema>;
+
+// Example backend submission function  
+// async function submitReportToBackend(data: ReportFormValues) {
+//   try {
+//     const response = await fetch('/api/report-lost', {
+//       method: 'POST',
+//       headers: { 'Content-Type': 'application/json' },
+//       body: JSON.stringify(data),
+//     });
+//     if (!response.ok) throw new Error('Failed to submit report');
+//     // handle success (e.g., show confirmation)
+//   } catch (error) {
+//     // handle error (e.g., show error message)
+//   }
+// }
+
+// Usage: <ReportDetailsForm onSubmit={submitReportToBackend} ... />
+
+export default function ReportDetailsForm({ categories, onBack, onSubmit }: { categories: string[]; onBack: () => void; onSubmit: (data: ReportFormValues) => void; }) {
+  const { control, handleSubmit, formState: { errors } } = useForm<ReportFormValues>({
+    resolver: zodResolver(reportSchema),
+    defaultValues: {
+      itemName: "",
+      category: "",
+      dateLost: "",
+      locationLastSeen: "",
+      location: "",
+      detailedDescription: "",
+    },
+  });
+
   return (
     <div className="min-h-screen w-full bg-gray-50 flex items-center justify-center px-2 sm:px-4 md:px-8 py-4">
       <div className="bg-white rounded-3xl shadow-sm w-full max-w-screen-sm sm:max-w-screen-md md:max-w-[900px] lg:max-w-[1100px] p-4 sm:p-6 md:p-10 lg:p-14 space-y-6">
@@ -44,28 +80,41 @@ export default function ReportDetailsForm({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Item Name</label>
-              <Input
-                type="text"
-                placeholder="Enter Item name"
-                value={formData.itemName}
-                onChange={(e) => onInputChange("itemName", e.target.value)}
-                className="bg-white border-gray-200"
+              <Controller
+                name="itemName"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    type="text"
+                    placeholder="Enter Item name"
+                    className="bg-white border-gray-200"
+                    {...field}
+                  />
+                )}
               />
+              {errors.itemName && <p className="text-xs text-red-500 mt-1">{errors.itemName.message}</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-              <Select value={formData.category} onValueChange={(value) => onInputChange("category", value)}>
-                <SelectTrigger className="bg-white border-gray-200">
-                  <SelectValue placeholder="Select a Category " />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {category}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Controller
+                name="category"
+                control={control}
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger className="bg-white border-gray-200">
+                      <SelectValue placeholder="Select a Category " />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((category) => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.category && <p className="text-xs text-red-500 mt-1">{errors.category.message}</p>}
             </div>
           </div>
 
@@ -75,26 +124,38 @@ export default function ReportDetailsForm({
               <label className="block text-sm font-medium text-gray-700 mb-2">Date Lost</label>
               <div className="relative">
                 <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                <Input
-                  type="date"
-                  placeholder="Enter Date Lost"
-                  value={formData.dateLost}
-                  onChange={(e) => onInputChange("dateLost", e.target.value)}
-                  className="pl-10 bg-white border-gray-200"
+                <Controller
+                  name="dateLost"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      type="date"
+                      placeholder="Enter Date Lost"
+                      className="pl-10 bg-white border-gray-200"
+                      {...field}
+                    />
+                  )}
                 />
+                {errors.dateLost && <p className="text-xs text-red-500 mt-1">{errors.dateLost.message}</p>}
               </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Location Last Seen</label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                <Input
-                  type="text"
-                  placeholder="Enter Location Last Seen"
-                  value={formData.locationLastSeen}
-                  onChange={(e) => onInputChange("locationLastSeen", e.target.value)}
-                  className="pl-10 bg-white border-gray-200"
+                <Controller
+                  name="locationLastSeen"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      type="text"
+                      placeholder="Enter Location Last Seen"
+                      className="pl-10 bg-white border-gray-200"
+                      {...field}
+                    />
+                  )}
                 />
+                {errors.locationLastSeen && <p className="text-xs text-red-500 mt-1">{errors.locationLastSeen.message}</p>}
               </div>
             </div>
           </div>
@@ -103,21 +164,33 @@ export default function ReportDetailsForm({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
-              <Textarea
-                placeholder="Where exactly did you last see the item? (e.g., Terminal 5, Starbucks)"
-                value={formData.location}
-                onChange={(e) => onInputChange("location", e.target.value)}
-                className="bg-white border-gray-200 min-h-[120px] resize-none"
+              <Controller
+                name="location"
+                control={control}
+                render={({ field }) => (
+                  <Textarea
+                    placeholder="Where exactly did you last see the item? (e.g., Terminal 5, Starbucks)"
+                    className="bg-white border-gray-200 min-h-[120px] resize-none"
+                    {...field}
+                  />
+                )}
               />
+              {errors.location && <p className="text-xs text-red-500 mt-1">{errors.location.message}</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Detailed Description</label>
-              <Textarea
-                placeholder="Describe the item and any unique features."
-                value={formData.detailedDescription}
-                onChange={(e) => onInputChange("detailedDescription", e.target.value)}
-                className="bg-white border-gray-200 min-h-[120px] resize-none"
+              <Controller
+                name="detailedDescription"
+                control={control}
+                render={({ field }) => (
+                  <Textarea
+                    placeholder="Describe the item and any unique features."
+                    className="bg-white border-gray-200 min-h-[120px] resize-none"
+                    {...field}
+                  />
+                )}
               />
+              {errors.detailedDescription && <p className="text-xs text-red-500 mt-1">{errors.detailedDescription.message}</p>}
             </div>
           </div>
         </div>
@@ -127,7 +200,7 @@ export default function ReportDetailsForm({
           <FoundlyButton
             as="button"
             type="button"
-            onClick={onSubmit}
+            onClick={handleSubmit(onSubmit)}
             className=""
           >
             Submit Report

@@ -1,7 +1,6 @@
-import Image from "next/image";
+// import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Check, X } from "lucide-react";
-import type { StaticImageData } from "next/image";
 
 interface FoundItem {
   itemName: string;
@@ -10,7 +9,7 @@ interface FoundItem {
   date: string;
   description: string;
   status: string;
-  image: StaticImageData;
+  matchPercentage: number;
 }
 
 interface FoundMatchesListProps {
@@ -53,42 +52,58 @@ export default function FoundMatchesList({
             foundItems.map((item) => (
               <div key={item.itemNumber} className="bg-gray-50 border border-gray-200 rounded-2xl p-3 sm:p-4 md:p-6">
                 <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
-                  {/* Item Image */}
-                  <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gray-200 rounded-xl overflow-hidden flex-shrink-0 relative">
-                    <Image
-                      src={item.image || "/placeholder.svg"}
-                      alt={item.itemName}
-                      fill
-                      style={{ objectFit: "cover" }}
-                      className="rounded-xl"
-                    />
+                  {/* Match Percentage */}
+                  <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gray-200 rounded-xl overflow-hidden flex-shrink-0 relative flex items-center justify-center">
+                    <span className="text-3xl sm:text-4xl font-bold text-cyan-600">{item.matchPercentage}%</span>
                   </div>
 
                   {/* Item Details */}
-                  <div className="flex-1 space-y-3 sm:space-y-4">
-                    <h2 className="text-lg sm:text-xl font-semibold text-gray-900">{item.itemName}</h2>
+                    <div className="flex-1 space-y-2 sm:space-y-2">
+                      <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-1">{item.itemName}</h2>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-                      <div>
-                        <p className="text-xs sm:text-sm text-gray-500 mb-1">Found at</p>
-                        <p className="font-medium text-gray-900 text-sm sm:text-base">{item.foundAt}</p>
+                      {/* Confidence Label */}
+                      {(() => {
+                        let label = '';
+                        let color = '';
+                        if (item.matchPercentage >= 90) {
+                          label = 'Very Strong Match';
+                          color = 'text-green-600 bg-green-100';
+                        } else if (item.matchPercentage >= 70) {
+                          label = 'Potential Match';
+                          color = 'text-orange-600 bg-orange-100';
+                        } else {
+                          label = 'Weak Match';
+                          color = 'text-gray-600 bg-gray-100';
+                        }
+                        return (
+                          <div className={`inline-block px-3 py-1 rounded-full font-semibold mb-1 text-sm sm:text-base ${color}`}
+                            title={`This match is based on an AI confidence score of ${item.matchPercentage}%.`}>
+                            {label} ({item.matchPercentage}%)
+                          </div>
+                        );
+                      })()}
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
+                        <div>
+                          <p className="text-xs sm:text-sm text-gray-500 mb-1">Found at</p>
+                          <p className="font-medium text-gray-900 text-sm sm:text-base">{item.foundAt}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs sm:text-sm text-gray-500 mb-1">Date</p>
+                          <p className="font-medium text-gray-900 text-sm sm:text-base">{item.date}</p>
+                        </div>
                       </div>
+
                       <div>
-                        <p className="text-xs sm:text-sm text-gray-500 mb-1">Date</p>
-                        <p className="font-medium text-gray-900 text-sm sm:text-base">{item.date}</p>
+                        <p className="text-xs sm:text-sm text-gray-500 mb-1">Description</p>
+                        <p className="font-medium text-gray-900 text-sm sm:text-base">{item.description}</p>
+                      </div>
+
+                      <div>
+                        <p className="text-xs sm:text-sm text-gray-500 mb-1">Status</p>
+                        <p className="font-medium text-gray-900 text-sm sm:text-base">{item.status}</p>
                       </div>
                     </div>
-
-                    <div>
-                      <p className="text-xs sm:text-sm text-gray-500 mb-1">Description</p>
-                      <p className="font-medium text-gray-900 text-sm sm:text-base">{item.description}</p>
-                    </div>
-
-                    <div>
-                      <p className="text-xs sm:text-sm text-gray-500 mb-1">Status</p>
-                      <p className="font-medium text-gray-900 text-sm sm:text-base">{item.status}</p>
-                    </div>
-                  </div>
                 </div>
 
                 {/* Action Buttons */}
