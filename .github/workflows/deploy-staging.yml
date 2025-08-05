@@ -7,6 +7,9 @@ on:
     branches:
       - staging
 
+  # Allow manual triggering from GitHub UI
+  workflow_dispatch:
+
 jobs:
   # Build and deploy all apps to staging
   deploy-staging:
