@@ -12,12 +12,8 @@ The main projects in this monorepo are:
 
 - `website`: The marketing website for Foundly ([Next.js](https://nextjs.org/))
 - `web-app`: The main Foundly application ([Next.js](https://nextjs.org/))
+- `admin`: The admin dashboard for Foundly ([Next.js](https://nextjs.org/))
 - `api`: The backend API for Foundly ([Hono](https://hono.dev/))
-
-There are also two starter/example apps for experimentation and learning:
-
-- `docs`: Example Next.js app with Tailwind CSS (for learning/messing around)
-- `web`: Another example Next.js app with Tailwind CSS (for learning/messing around)
 
 Other packages include shared UI components, TypeScript configs, and ESLint configs.
 
@@ -46,10 +42,12 @@ Or follow the official instructions at [https://pnpm.io/installation](https://pn
 - **Run a dev server for a specific app:**
   - Marketing website: `pnpm --filter website dev`
   - Main app: `pnpm --filter web-app dev`
+  - Admin dashboard: `pnpm --filter admin dev`
   - API: `pnpm --filter api dev`
 - **Build a specific app:**
   - Marketing website: `pnpm --filter website build`
   - Main app: `pnpm --filter web-app build`
+  - Admin dashboard: `pnpm --filter admin build`
   - API: `pnpm --filter api build`
 - **Add a new package to an app (e.g., add `axios` to `web-app`):**
   ```sh
@@ -65,15 +63,11 @@ Or follow the official instructions at [https://pnpm.io/installation](https://pn
 - To run, build, or test a specific app or package, use the `--filter` flag with the name of the app/package.
   - Example: `pnpm --filter api test`
 - You can also run scripts defined in each app's `package.json` using the same filter approach.
-- The main apps you will work on are `website`, `web-app`, and `api`.
+- The main apps you will work on are `website`, `web-app`, `admin`, and `api`.
 
 ### Turborepo Remote Caching (Optional)
 
 To speed up builds and CI, you can enable [Turborepo Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching). See the [Turbo docs](https://turbo.build/repo/docs/core-concepts/remote-caching) for setup instructions. This is optional but recommended for teams.
-
-## Using the Example Apps
-
-The `docs` and `web` folders are example Next.js apps included for learning and experimentation. You can use them to try out new ideas or test features without affecting the main Foundly apps.
 
 ## What's inside?
 
@@ -81,8 +75,8 @@ This monorepo includes:
 
 - `website`: Foundly marketing website (Next.js)
 - `web-app`: Main Foundly application (Next.js)
+- `admin`: Foundly admin dashboard (Next.js)
 - `api`: Foundly backend API (Hono)
-- `docs` and `web`: Example/learning apps (Next.js)
 - `ui`: Shared React component library (used by main apps)
 - `@repo/eslint-config`: Shared ESLint config
 - `@repo/typescript-config`: Shared TypeScript config
