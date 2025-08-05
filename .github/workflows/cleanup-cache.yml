@@ -1,37 +1,40 @@
-name: Cleanup Caches on PR Close
+name: Cleanup Old Caches
 
 on:
-  pull_request:
-    types:
-      - closed
+  # Run automatically every day at 2 AM UTC to clean up old caches
+  schedule:
+    - cron: "0 2 * * *" # Every day at 2 AM UTC
+
+  # Also allow manual triggering from GitHub UI
+  workflow_dispatch:
 
 jobs:
   cleanup:
-    name: Cleanup Build Caches
+    name: Cleanup Old Build Caches
     runs-on: ubuntu-latest
     permissions:
       actions: write
 
     steps:
-      - name: Cleanup caches for closed PR
+      - name: Cleanup caches older than 7 days
         run: |
-          echo "🧹 Cleaning up caches for PR #${{ github.event.pull_request.number }}"
+          echo "🧹 Cleaning up caches older than 7 days..."
 
-          # Get the PR branch reference
-          BRANCH="refs/pull/${{ github.event.pull_request.number }}/merge"
+          # Calculate date 7 days ago
+          cutoff_date=$(date -d '7 days ago' -u +%Y-%m-%dT%H:%M:%SZ)
+          echo "Cutoff date: $cutoff_date"
 
-          echo "Fetching cache keys for branch: $BRANCH"
+          # Get all caches
+          echo "Fetching all cache keys..."
+          all_caches=$(gh cache list --limit 100 --json id,key,createdAt --jq '.[] | select(.createdAt < "'$cutoff_date'") | .id' 2>/dev/null || echo "")
 
-          # Get cache keys for this PR branch
-          cacheKeysForPR=$(gh cache list --ref "$BRANCH" --limit 100 --json id --jq '.[].id' 2>/dev/null || echo "")
-
-          if [[ -z "$cacheKeysForPR" ]]; then
-            echo "No caches found for this PR branch"
+          if [[ -z "$all_caches" ]]; then
+            echo "✅ No old caches found (older than 7 days)"
             exit 0
           fi
 
-          echo "Found caches to delete:"
-          gh cache list --ref "$BRANCH" --limit 100 || true
+          echo "Found old caches to delete:"
+          gh cache list --limit 100 --json id,key,createdAt --jq '.[] | select(.createdAt < "'$cutoff_date'") | "\(.id) - \(.key) (created: \(.createdAt))"' || true
 
           # Avoid failing the workflow if deletion errors occur
           set +e
@@ -39,24 +42,24 @@ jobs:
           deleted_count=0
           failed_count=0
 
-          echo "Deleting caches..."
-          for cacheKey in $cacheKeysForPR; do
-            if gh cache delete "$cacheKey"; then
-              echo "✅ Deleted cache: $cacheKey"
+          echo "Deleting old caches..."
+          for cacheId in $all_caches; do
+            if gh cache delete "$cacheId"; then
+              echo "✅ Deleted cache: $cacheId"
               ((deleted_count++))
             else
-              echo "❌ Failed to delete cache: $cacheKey"
+              echo "❌ Failed to delete cache: $cacheId"
               ((failed_count++))
             fi
           done
 
           echo "🧹 Cache cleanup summary:"
-          echo "   - Deleted: $deleted_count caches"
-          echo "   - Failed: $failed_count caches"
+          echo "   - Deleted: $deleted_count old caches"
+          echo "   - Failed: $failed_count deletions"
           echo "   - Total processed: $((deleted_count + failed_count)) caches"
 
           if [[ $failed_count -eq 0 ]]; then
-            echo "✅ All caches cleaned up successfully"
+            echo "✅ All old caches cleaned up successfully"
           else
             echo "⚠️  Some cache deletions failed, but this is not critical"
           fi
