@@ -11,9 +11,9 @@
     "test:int:watch": "vitest --project integration --watch",
     "dev": "wrangler dev",
     "deploy": "wrangler deploy --minify --keep-vars",
-    "deploy:prod": "wrangler deploy --minify --env production",
-    "deploy:preview": "wrangler deploy --minify --env preview",
-    "deploy:stage": "wrangler deploy --minify --env staging",
+    "deploy:preview": "wrangler deploy --minify --env preview --keep-vars",
+    "deploy:stage": "wrangler deploy --minify --env staging --keep-vars",
+    "deploy:prod": "wrangler deploy --minify --env production --keep-vars",
     "cf-typegen": "wrangler types --env-interface CloudflareBindings"
   },
   "dependencies": {

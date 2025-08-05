@@ -1,0 +1,66 @@
+name: Cleanup Caches on PR Close
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  cleanup:
+    name: Cleanup Build Caches
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+
+    steps:
+      - name: Cleanup caches for closed PR
+        run: |
+          echo "🧹 Cleaning up caches for PR #${{ github.event.pull_request.number }}"
+
+          # Get the PR branch reference
+          BRANCH="refs/pull/${{ github.event.pull_request.number }}/merge"
+
+          echo "Fetching cache keys for branch: $BRANCH"
+
+          # Get cache keys for this PR branch
+          cacheKeysForPR=$(gh cache list --ref "$BRANCH" --limit 100 --json id --jq '.[].id' 2>/dev/null || echo "")
+
+          if [[ -z "$cacheKeysForPR" ]]; then
+            echo "No caches found for this PR branch"
+            exit 0
+          fi
+
+          echo "Found caches to delete:"
+          gh cache list --ref "$BRANCH" --limit 100 || true
+
+          # Avoid failing the workflow if deletion errors occur
+          set +e
+
+          deleted_count=0
+          failed_count=0
+
+          echo "Deleting caches..."
+          for cacheKey in $cacheKeysForPR; do
+            if gh cache delete "$cacheKey"; then
+              echo "✅ Deleted cache: $cacheKey"
+              ((deleted_count++))
+            else
+              echo "❌ Failed to delete cache: $cacheKey"
+              ((failed_count++))
+            fi
+          done
+
+          echo "🧹 Cache cleanup summary:"
+          echo "   - Deleted: $deleted_count caches"
+          echo "   - Failed: $failed_count caches"
+          echo "   - Total processed: $((deleted_count + failed_count)) caches"
+
+          if [[ $failed_count -eq 0 ]]; then
+            echo "✅ All caches cleaned up successfully"
+          else
+            echo "⚠️  Some cache deletions failed, but this is not critical"
+          fi
+
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}

@@ -5,11 +5,11 @@
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
     "directory": ".open-next/assets",
-    "binding": "ASSETS"
+    "binding": "ASSETS",
   },
   "observability": {
     "enabled": true,
-    "head_sampling_rate": 1.0
+    "head_sampling_rate": 1.0,
     // Uncomment the line below to reduce the head sampling rate for production
     // "head_sampling_rate": 0.1
   },
@@ -19,27 +19,27 @@
       "routes": [
         {
           "pattern": "app.foundlyhq.com",
-          "custom_domain": true
-        }
-      ]
+          "custom_domain": true,
+        },
+      ],
     },
     "staging": {
       "name": "foundly-app-staging",
       "routes": [
         {
           "pattern": "staging.app.foundlyhq.com",
-          "custom_domain": true
-        }
-      ]
+          "custom_domain": true,
+        },
+      ],
     },
     "production": {
       "name": "foundly-app-production",
       "routes": [
         {
           "pattern": "preview.prod.foundlyhq.com",
-          "custom_domain": true
-        }
-      ]
-    }
-  }
+          "custom_domain": true,
+        },
+      ],
+    },
+  },
 }

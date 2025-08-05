@@ -1,185 +1,143 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "foundly-api-production",
+  "name": "foundly-api",
   "main": "src/index.ts",
   "compatibility_date": "2025-07-28",
-  "routes": [
-    {
-      "pattern": "api.foundlyhq.com",
-      "custom_domain": true
-    }
-  ],
   "durable_objects": {
     "bindings": [
       {
         "name": "INSTITUTION_DRAFT",
-        "class_name": "InstitutionDraftDO"
+        "class_name": "InstitutionDraftDO",
       },
       {
         "name": "ADMIN_REGISTRY_DO",
-        "class_name": "AdminRegistryDO"
-      }
-    ]
+        "class_name": "AdminRegistryDO",
+      },
+    ],
   },
   "migrations": [
     {
       "tag": "v1",
-      "new_sqlite_classes": ["InstitutionDraftDO", "AdminRegistryDO"]
-    }
+      "new_sqlite_classes": ["InstitutionDraftDO", "AdminRegistryDO"],
+    },
   ],
 
   "d1_databases": [
     {
       "binding": "FOUNDLYDB",
       "database_name": "foundly-db",
-      "database_id": "07e00cbb-ded4-4468-959e-7e04fed3ef57"
-    }
+      "database_id": "07e00cbb-ded4-4468-959e-7e04fed3ef57",
+    },
   ],
 
   "kv_namespaces": [
     {
       "binding": "DOMAIN_CACHE",
-      "id": "69452f617c284fa0afa27cf5765c85eb"
-    }
+      "id": "69452f617c284fa0afa27cf5765c85eb",
+    },
   ],
   "observability": {
     "enabled": true,
-    "head_sampling_rate": 1.0
+    "head_sampling_rate": 1.0,
     // Uncomment the line below to reduce the head sampling rate for production
     // "head_sampling_rate": 0.1
-  }
-
-  // Commented out environment configurations - moved to bottom
-  // "env": {
-  //   "preview": {
-  //     "name": "foundly-api-preview",
-  //     "durable_objects": {
-  //       "bindings": [
-  //         {
-  //           "name": "INSTITUTION_DRAFT",
-  //           "class_name": "InstitutionDraftDO"
-  //         },
-  //         {
-  //           "name": "ADMIN_REGISTRY_DO",
-  //           "class_name": "AdminRegistryDO"
-  //         }
-  //       ]
-  //     },
-  //     "d1_databases": [
-  //       {
-  //         "binding": "FOUNDLYDB",
-  //         "database_name": "foundly-db",
-  //         "database_id": "07e00cbb-ded4-4468-959e-7e04fed3ef57"
-  //       }
-  //     ],
-  //     "kv_namespaces": [
-  //       {
-  //         "binding": "DOMAIN_CACHE",
-  //         "id": "69452f617c284fa0afa27cf5765c85eb"
-  //       }
-  //     ]
-  //   },
-  //   "staging": {
-  //     "name": "foundly-api-staging",
-  //     "routes": [
-  //       {
-  //         "pattern": "staging.api.foundlyhq.com",
-  //         "custom_domain": true
-  //       }
-  //     ],
-  //     "durable_objects": {
-  //       "bindings": [
-  //         {
-  //           "name": "INSTITUTION_DRAFT",
-  //           "class_name": "InstitutionDraftDO"
-  //         },
-  //         {
-  //           "name": "ADMIN_REGISTRY_DO",
-  //           "class_name": "AdminRegistryDO"
-  //         }
-  //       ]
-  //     },
-  //     "d1_databases": [
-  //       {
-  //         "binding": "FOUNDLYDB",
-  //         "database_name": "foundly-db",
-  //         "database_id": "07e00cbb-ded4-4468-959e-7e04fed3ef57"
-  //       }
-  //     ],
-  //     "kv_namespaces": [
-  //       {
-  //         "binding": "DOMAIN_CACHE",
-  //         "id": "69452f617c284fa0afa27cf5765c85eb"
-  //       }
-  //     ]
-  //   },
-  //   "production": {
-  //     "name": "foundly-api-production",
-  //     "routes": [
-  //       {
-  //         "pattern": "api.foundlyhq.com",
-  //         "custom_domain": true
-  //       }
-  //     ],
-  //     "durable_objects": {
-  //       "bindings": [
-  //         {
-  //           "name": "INSTITUTION_DRAFT",
-  //           "class_name": "InstitutionDraftDO"
-  //         },
-  //         {
-  //           "name": "ADMIN_REGISTRY_DO",
-  //           "class_name": "AdminRegistryDO"
-  //         }
-  //       ]
-  //     },
-  //     "d1_databases": [
-  //       {
-  //         "binding": "FOUNDLYDB",
-  //         "database_name": "foundly-db",
-  //         "database_id": "07e00cbb-ded4-4468-959e-7e04fed3ef57"
-  //       }
-  //     ],
-  //     "kv_namespaces": [
-  //       {
-  //         "binding": "DOMAIN_CACHE",
-  //         "id": "69452f617c284fa0afa27cf5765c85eb"
-  //       }
-  //     ]
-  //   }
-  // },
-
-  //   "rules": [
-  //   {
-  //     "type": "Text",
-  //     "globs": ["**/*.sql"],
-  //     "fallthrough": true
-  //   }
-  // ],
-  // "compatibility_flags": [
-  //   "nodejs_compat"
-  // ],
-  // "vars": {
-  //   "MY_VAR": "my-variable"
-  // },
-  // "r2_buckets": [
-  //   {
-  //     "binding": "MY_BUCKET",
-  //     "bucket_name": "my-bucket"
-  //   }
-  // ],
-  // "d1_databases": [
-  //   {
-  //     "binding": "MY_DB",
-  //     "database_name": "my-database",
-  //     "database_id": ""
-  //   }
-  // ],
-  // "ai": {
-  //   "binding": "AI"
-  // },
-  // "observability": {
-  //   "enabled": true,
-  //   "head_sampling_rate": 1
-  // }
+  },
+  "env": {
+    "preview": {
+      "name": "foundly-api-preview",
+      "durable_objects": {
+        "bindings": [
+          {
+            "name": "INSTITUTION_DRAFT",
+            "class_name": "InstitutionDraftDO",
+          },
+          {
+            "name": "ADMIN_REGISTRY_DO",
+            "class_name": "AdminRegistryDO",
+          },
+        ],
+      },
+      "d1_databases": [
+        {
+          "binding": "FOUNDLYDB",
+          "database_name": "foundly-db-preview",
+          "database_id": "07e00cbb-ded4-4468-959e-7e04fed3ef57",
+        },
+      ],
+      "kv_namespaces": [
+        {
+          "binding": "DOMAIN_CACHE",
+          "id": "69452f617c284fa0afa27cf5765c85eb",
+        },
+      ],
+    },
+    "staging": {
+      "name": "foundly-api-staging",
+      "routes": [
+        {
+          "pattern": "staging.api.foundlyhq.com",
+          "custom_domain": true,
+        },
+      ],
+      "durable_objects": {
+        "bindings": [
+          {
+            "name": "INSTITUTION_DRAFT",
+            "class_name": "InstitutionDraftDO",
+          },
+          {
+            "name": "ADMIN_REGISTRY_DO",
+            "class_name": "AdminRegistryDO",
+          },
+        ],
+      },
+      "d1_databases": [
+        {
+          "binding": "FOUNDLYDB",
+          "database_name": "foundly-db-staging",
+          "database_id": "07e00cbb-ded4-4468-959e-7e04fed3ef57",
+        },
+      ],
+      "kv_namespaces": [
+        {
+          "binding": "DOMAIN_CACHE",
+          "id": "69452f617c284fa0afa27cf5765c85eb",
+        },
+      ],
+    },
+    "production": {
+      "name": "foundly-api-production",
+      "routes": [
+        {
+          "pattern": "api.foundlyhq.com",
+          "custom_domain": true,
+        },
+      ],
+      "durable_objects": {
+        "bindings": [
+          {
+            "name": "INSTITUTION_DRAFT",
+            "class_name": "InstitutionDraftDO",
+          },
+          {
+            "name": "ADMIN_REGISTRY_DO",
+            "class_name": "AdminRegistryDO",
+          },
+        ],
+      },
+      "d1_databases": [
+        {
+          "binding": "FOUNDLYDB",
+          "database_name": "foundly-db",
+          "database_id": "07e00cbb-ded4-4468-959e-7e04fed3ef57",
+        },
+      ],
+      "kv_namespaces": [
+        {
+          "binding": "DOMAIN_CACHE",
+          "id": "69452f617c284fa0afa27cf5765c85eb",
+        },
+      ],
+    },
+  },
 }

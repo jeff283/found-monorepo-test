@@ -30,6 +30,9 @@ yarn-error.log*
 .env.production.local
 .env*
 
+# exclude the .env.example file
+!.env.example
+
 # turbo
 .turbo
 

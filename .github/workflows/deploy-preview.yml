@@ -1,0 +1,206 @@
+name: Deploy Preview Environment
+
+on:
+  pull_request:
+    branches:
+      - master
+      - main
+      - staging
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  deploy-preview:
+    name: Deploy Preview Environment
+    runs-on: ubuntu-latest
+
+    # Add concurrency to prevent multiple preview deployments for the same PR
+    concurrency:
+      group: preview-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    env:
+      # Cloudflare configuration
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      # Clerk authentication (using dev keys)
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY_DEV }}
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY_DEV }}
+      CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY_DEV }}
+
+      # Supabase (using dev environment)
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL_DEV }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY_DEV }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY_DEV }}
+
+      # Database (using dev)
+      DATABASE_URL: ${{ secrets.DATABASE_URL_DEV }}
+
+      # Website-specific secrets
+      MAILERLITE_API_KEY: ${{ secrets.MAILERLITE_API_KEY }}
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+      TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY }}
+      NEXT_PUBLIC_BASE_URL: ${{ secrets.NEXT_PUBLIC_BASE_URL }}
+
+      # API URL (preview environment)
+      NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL_DEV }}
+
+      # Turborepo caching
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.14.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Linting
+        run: pnpm run lint
+
+      - name: Build Packages
+        run: pnpm run build --filter="./packages/*"
+
+      # Deploy all apps to preview using Turbo
+      - name: Deploy All Apps to Preview
+        id: preview-deploy
+        run: |
+          set -e  # Exit immediately if any command fails
+          echo "🚀 Deploying all apps to preview using Turbo..."
+          echo ""
+          echo "� Environment Check:"
+          echo "CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN:+[SET]} ${CLOUDFLARE_API_TOKEN:-[NOT SET]}"
+          echo "CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID:+[SET]} ${CLOUDFLARE_ACCOUNT_ID:-[NOT SET]}"
+          echo "TURBO_TOKEN: ${TURBO_TOKEN:+[SET]} ${TURBO_TOKEN:-[NOT SET]}"
+          echo ""
+          echo "�📋 Available scripts:"
+          pnpm run 2>&1 | grep "deploy:" || echo "No deploy scripts found"
+          echo ""
+          echo "🔍 Running deploy:preview..."
+          # Capture output and display it live while saving to variable
+          OUTPUT=$(pnpm run deploy:preview 2>&1 | tee /dev/stderr)
+          echo ""
+          echo "🔍 Extracting deployment URLs..."
+
+          # Extract URLs from the output - both full URLs and custom domains
+          FULL_URLS=$(echo "$OUTPUT" | grep -oE 'https://[a-zA-Z0-9.-]+\.(workers\.dev|pages\.dev|foundlyhq\.com)[/a-zA-Z0-9._-]*')
+          CUSTOM_DOMAINS=$(echo "$OUTPUT" | grep -oE '[a-zA-Z0-9.-]+\.foundlyhq\.com \(custom domain\)' | sed 's/ (custom domain)//')
+
+          # Combine and format all URLs
+          URLS=""
+          if [[ -n "$FULL_URLS" ]]; then
+            URLS="$FULL_URLS"
+          fi
+          if [[ -n "$CUSTOM_DOMAINS" ]]; then
+            # Add https:// prefix to custom domains
+            FORMATTED_CUSTOM=$(echo "$CUSTOM_DOMAINS" | sed 's/^/https:\/\//')
+            if [[ -n "$URLS" ]]; then
+              URLS="$URLS"$'\n'"$FORMATTED_CUSTOM"
+            else
+              URLS="$FORMATTED_CUSTOM"
+            fi
+          fi
+
+          # Remove duplicates and sort
+          URLS=$(echo "$URLS" | sort -u)
+
+          echo "Found URLs:"
+          echo "$URLS"
+          # Set outputs for GitHub Actions
+          {
+            echo "PREVIEW_URLS<<EOF"
+            echo "$URLS"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+          echo "✅ Deployment completed successfully"
+
+      # Comment on PR with deployment status
+      - name: Comment on Pull Request with Deployment Status
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const urls = `${{ steps.preview-deploy.outputs.PREVIEW_URLS }}`;
+            const urlList = urls.split('\n').filter(url => url.trim() !== '');
+
+            let comment = `## 🔍 Preview Deployments\n\n`;
+            comment += `Pull Request #${{ github.event.pull_request.number }} has been deployed to preview environments:\n\n`;
+
+            if (urlList.length > 0) {
+              urlList.forEach((url, index) => {
+                const cleanUrl = url.trim();
+                if (cleanUrl) {
+                  // Try to determine app type from URL
+                  let appName = "App";
+                  if (cleanUrl.includes('api')) appName = "⚡ API";
+                  else if (cleanUrl.includes('admin')) appName = "👥 Admin";
+                  else if (cleanUrl.includes('app')) appName = "� Web App";
+                  else if (cleanUrl.includes('website') || cleanUrl.includes('foundly')) appName = "🌍 Website";
+                  else appName = `📱 App ${index + 1}`;
+                  
+                  comment += `${appName}: [${cleanUrl}](${cleanUrl})\n`;
+                }
+              });
+            } else {
+              comment += `� Deployments in progress... URLs will be available shortly.\n`;
+            }
+
+            comment += `\n---\n`;
+            comment += `*Preview environments are automatically updated when you push new commits to this PR.*`;
+
+            // Check if we already commented on this PR
+            const { data: comments } = await github.rest.issues.listComments({
+              issue_number: context.payload.pull_request.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+
+            const existingComment = comments.find(comment => 
+              comment.body.includes('## 🔍 Preview Deployments') && 
+              comment.user.type === 'Bot'
+            );
+
+            if (existingComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                comment_id: existingComment.id,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                issue_number: context.payload.pull_request.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            }
+
+      # Summary
+      - name: Preview Deployment Summary
+        run: |
+          echo "✅ Preview deployment completed for PR #${{ github.event.pull_request.number }}"
+          echo "🔗 Check the PR comments for preview URLs"
