@@ -1,30 +1,16 @@
 name: Deploy to Staging
 
 on:
-  # Deploy to staging when PR is merged to staging or direct push to staging
+  # Deploy to staging when code is pushed to staging
+  # This includes both direct pushes and merged PRs
   push:
-    branches:
-      - staging
-
-  # Deploy to staging when PR is merged to staging
-  pull_request:
-    types:
-      - closed
     branches:
       - staging
 
 jobs:
   # Build and deploy all apps to staging
   deploy-staging:
-    # Only run if it's a push to staging OR a merged PR to staging
-    if: |
-      (github.event_name == 'push') || 
-      (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
     runs-on: ubuntu-latest
-    # Add concurrency to prevent duplicate deployments
-    concurrency:
-      group: deploy-staging-${{ github.ref }}
-      cancel-in-progress: true
 
     permissions:
       contents: read
