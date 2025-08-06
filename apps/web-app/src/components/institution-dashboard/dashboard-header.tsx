@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Home, Shield, BarChart3, MapPin, Users, ClipboardList, Menu, X } from 'lucide-react';
+import { MessagesSheet } from '@/components/navbar-popovers/messages-sheet';
 import Image from 'next/image';
 import FoundlyLogo from '@/assets/images/logos/Foundly Logo.png';
 import { Button } from '@/components/ui/button';
@@ -104,6 +105,9 @@ export function DashboardHeader({ user, compact }: DashboardHeaderProps) {
         </div>
         <div className="rounded-lg">
           <GridPopover />
+        </div>
+        <div className="rounded-lg">
+          <MessagesSheet /> 
         </div>
         <div className="rounded-lg">
           <NotificationsPopover />
