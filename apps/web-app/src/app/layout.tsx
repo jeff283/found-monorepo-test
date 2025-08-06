@@ -2,12 +2,29 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Host_Grotesk } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
-import { Toaster } from "sonner"; // ✅ Add this line
+import { Toaster } from "@/components/ui/sonner"; // ✅ Add this line
 
 const hostGrotesk = Host_Grotesk({
   variable: "--font-host-grotesk",
   subsets: ["latin"],
 });
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <ClerkProvider>
+      <html lang="en">
+        <body className={`${hostGrotesk.variable} antialiased`}>
+          <Toaster richColors position="top-center" />
+          {children}
+        </body>
+      </html>
+    </ClerkProvider>
+  );
+}
 
 export const metadata: Metadata = {
   title: "Foundly App",
@@ -41,23 +58,7 @@ export const metadata: Metadata = {
     },
     {
       name: "Victor Musembi",
+      url: "https://github.com/VictorNzai",
     },
   ],
 };
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <ClerkProvider>
-      <html lang="en">
-        <body className={`${hostGrotesk.variable} antialiased`}>
-          <Toaster richColors position="top-center" /> 
-          {children}
-        </body>
-      </html>
-    </ClerkProvider>
-  );
-}

@@ -21,7 +21,9 @@
     "lint": "eslint src --max-warnings 0"
   },
   "peerDependencies": {
-    "react": "^19"
+    "react": "^19",
+    "next": "^15",
+    "lucide-react": "^0.523.0"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
@@ -29,6 +31,8 @@
     "@repo/typescript-config": "workspace:*",
     "@tailwindcss/cli": "^4.1.5",
     "@types/react": "^19.1.0",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.3.1",
     "eslint": "^9.31.0",
     "tailwindcss": "^4.1.5",
     "typescript": "5.8.2"

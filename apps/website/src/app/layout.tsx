@@ -7,6 +7,18 @@ const hostGrotesk = Host_Grotesk({
   subsets: ["latin"],
 });
 
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en">
+      <body className={`${hostGrotesk.variable}  antialiased`}>{children}</body>
+    </html>
+  );
+}
+
 export const metadata: Metadata = {
   title: "Foundly",
   description: "Smarter Lost and Found for Modern Institutions",
@@ -35,7 +47,7 @@ export const metadata: Metadata = {
     "Found Item Reporting",
     "Lost and Found Technology",
     "Item Return System",
-    "Lost Property Tracking"
+    "Lost Property Tracking",
   ],
   creator: "Foundly Team",
   openGraph: {
@@ -65,18 +77,7 @@ export const metadata: Metadata = {
     },
     {
       name: "Victor Musembi",
+      url: "https://github.com/VictorNzai",
     },
   ],
 };
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html lang="en">
-      <body className={`${hostGrotesk.variable}  antialiased`}>{children}</body>
-    </html>
-  );
-}
