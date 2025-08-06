@@ -1,5 +1,5 @@
 
-import { ItemsChart } from '@/components/institution-dashboard/items-chart';
+import { ItemsChart } from '@/components/common/items-chart';
 import { ReportTable } from '@/components/institution-dashboard/reports/reports-finds-table';
 import { DashboardHeader } from '@/components/institution-dashboard/dashboard-header';
 import { Search, Users, FileText } from 'lucide-react';

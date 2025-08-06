@@ -27,12 +27,12 @@
 import { DashboardHeader } from "@/components/institution-dashboard/dashboard-header";
 import { WelcomeSection } from "@/components/institution-dashboard/welcome-section";
 import { StatsCards } from "@/components/common/stats-cards";
-import { LiveAlerts } from "@/components/institution-dashboard/live-alerts";
+import { LiveAlerts } from "@/components/common/live-alerts";
+import { ItemsChart } from "@/components/common/items-chart";
+import { LatestFindsTable } from "@/components/common/latest-finds-table";
 import { ItemStatusChart } from "@/components/institution-dashboard/item-status-chart";
-import { ItemsChart } from "@/components/institution-dashboard/items-chart";
-import { LatestFindsTable } from "@/components/institution-dashboard/latest-finds-table";
 import { FileText, Search, Users, Lightbulb } from "lucide-react";
-import type { Alert } from "@/components/institution-dashboard/live-alerts";
+// import type { Alert } from "@/components/instituti/live-alerts";
 
 export default function Dashboard() {
  
@@ -55,8 +55,6 @@ export default function Dashboard() {
 // alert object includes a type property with one of these values ("found", "report", or "match"). 
 // The component will automatically display the correct icon for each alert type.
 
-
- 
   // import { useEffect, useState } from "react";
   // const [stats, setStats] = useState([]);
   // useEffect(() => {
@@ -112,24 +110,24 @@ export default function Dashboard() {
     },
   ];
 
-  const alerts: Alert[] = [
+  const alerts = [
     {
       id: "1042",
       title: "Item #1042",
       description: "Black Backpack found at Lobby",
-      type: "found",
+      type: "found" as const,
     },
     {
       id: "913",
       title: "Lost Report #913 submitted",
       description: "Lost Phone",
-      type: "report",
+      type: "report" as const,
     },
     {
       id: "match",
       title: "Suggested Match",
       description: "#1041 → Report #912 (94%)",
-      type: "match",
+      type: "match" as const,
     },
   ];
 
@@ -148,6 +146,13 @@ export default function Dashboard() {
 
         <div className="flex flex-col lg:flex-row gap-4 w-full">
           <div className="w-full lg:w-1/2">
+          {/* to simulate the empty state when the account is new  */}
+           {/* <ItemsChart
+              compact
+              monthlyData={[]}   
+              weeklyData={[]}    
+              dailyData={[]}    
+            /> */}
             <ItemsChart
               compact
             monthlyData={[
