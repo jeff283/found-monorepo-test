@@ -11,8 +11,9 @@ export const corsMiddleware = cors({
   origin: [
     "https://foundlyhq.com",
     "https://app.foundlyhq.com",
-    "https://*.foundlyhq.com",
     "http://localhost:3000",
+    "https://*.foundlyhq.com",
+    "https://*.foundlyhq.workers.dev",
   ],
 });
 
