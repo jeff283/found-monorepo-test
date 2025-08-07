@@ -134,7 +134,11 @@ const personalAccountSchema = z.object({
       return !publicEmailDomains.includes(domain);
     }, "Please use your business email address (not a public email like Gmail, Yahoo, etc.)"),
 
-  jobTitle: z.string().optional(),
+  jobTitle: z
+    .string()
+    .min(1, "Job title is required")
+    .min(2, "Job title must be at least 2 characters")
+    .max(100, "Job title must be less than 100 characters"),
 
   password: z
     .string()
@@ -223,18 +227,16 @@ export default function CreatePersonalAccountPage() {
         await setActive({ session: result.createdSessionId });
       }
 
-      // Update user's public metadata with job title if provided using server action
-      if (data.jobTitle) {
-        const metadataResult = await updateUserJobTitle(data.jobTitle);
+      // Update user's public metadata with job title using server action
+      const metadataResult = await updateUserJobTitle(data.jobTitle);
 
-        if (!metadataResult.success) {
-          console.warn(
-            "Clerk account created but metadata update failed:",
-            metadataResult.error
-          );
-          // We don't throw here since the main account was created successfully
-          // The job title can be added later through the user profile
-        }
+      if (!metadataResult.success) {
+        console.warn(
+          "Clerk account created but metadata update failed:",
+          metadataResult.error
+        );
+        // We don't throw here since the main account was created successfully
+        // The job title can be added later through the user profile
       }
 
       return result;
@@ -384,13 +386,13 @@ export default function CreatePersonalAccountPage() {
           )}
         </div>
 
-        {/* Job Title (Optional) */}
+        {/* Job Title */}
         <div className="flex flex-col gap-1">
           <label
             htmlFor="jobTitle"
             className="text-sm text-left font-medium text-gray-700"
           >
-            Job Title (Optional)
+            Job Title
           </label>
           <AuthInput
             id="jobTitle"
@@ -399,6 +401,11 @@ export default function CreatePersonalAccountPage() {
             icon={BriefcaseIcon}
             {...register("jobTitle")}
           />
+          {errors.jobTitle && (
+            <p className="text-red-500 text-xs text-left mt-1">
+              {errors.jobTitle.message}
+            </p>
+          )}
         </div>
 
         {/* Password */}

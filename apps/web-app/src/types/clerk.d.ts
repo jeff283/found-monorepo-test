@@ -3,7 +3,7 @@
  */
 
 export interface FoundlyUserPublicMetadata {
-  jobTitle?: string;
+  jobTitle: string;
   // Add other public metadata fields as needed
 }
 

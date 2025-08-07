@@ -19,8 +19,8 @@ export async function updateUserJobTitle(jobTitle: string) {
 
   if (!jobTitle || jobTitle.trim() === "") {
     return {
-      success: true,
-      message: "No job title to update",
+      success: false,
+      error: "Job title is required",
     };
   }
 
