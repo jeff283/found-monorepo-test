@@ -29,6 +29,7 @@ import {
   withErrorHandling,
   showSuccessToast,
 } from "@/utils/auth-error-handler";
+import ContactSupport from "@/components/authentication/ContactSupport";
 
 /**
  * Comprehensive list of public email domains to prevent institution registration
@@ -332,10 +333,8 @@ export default function CreatePersonalAccountPage() {
   const topBar = (
     <div className="flex justify-between items-center w-full">
       <AuthBackButton />
-      <button className="caption text-muted-foreground hover:underline flex items-center gap-1">
-        <PhoneIcon size={16} className="inline-block mr-1" />
-        Contact support
-      </button>
+
+      <ContactSupport variant="minimal" />
     </div>
   );
 
@@ -492,12 +491,12 @@ export default function CreatePersonalAccountPage() {
                     requirements.filter((r) => r.met).length === 4
                       ? "bg-green-600" // All requirements met - strong
                       : requirements.filter((r) => r.met).length === 3
-                      ? "bg-green-400" // 3/4 requirements - good
-                      : requirements.filter((r) => r.met).length === 2
-                      ? "bg-yellow-400" // 2/4 requirements - fair
-                      : requirements.filter((r) => r.met).length === 1
-                      ? "bg-orange-400" // 1/4 requirements - weak
-                      : "bg-red-400" // No requirements met - very weak
+                        ? "bg-green-400" // 3/4 requirements - good
+                        : requirements.filter((r) => r.met).length === 2
+                          ? "bg-yellow-400" // 2/4 requirements - fair
+                          : requirements.filter((r) => r.met).length === 1
+                            ? "bg-orange-400" // 1/4 requirements - weak
+                            : "bg-red-400" // No requirements met - very weak
                   }`}
                   style={{
                     // Progress bar width based on percentage of requirements met

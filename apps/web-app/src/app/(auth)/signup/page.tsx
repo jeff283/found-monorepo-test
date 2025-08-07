@@ -9,6 +9,7 @@ import AuthHeader from "@/components/authentication/AuthHeader";
 import AuthBackButton from "@/components/authentication/AuthBackButton";
 import FoundlyButton from "@/components/authentication/FoundlyButton";
 import AuthFooter from "@/components/authentication/AuthFooter";
+import ContactSupport from "@/components/authentication/ContactSupport";
 
 export default function RegisterChoicePage() {
   const [selected, setSelected] = useState<"individual" | "institution" | null>(
@@ -19,9 +20,7 @@ export default function RegisterChoicePage() {
   const topBar = (
     <div className="flex justify-between items-center w-full">
       <AuthBackButton />
-      <button className="caption text-muted-foreground hover:underline flex items-center gap-1">
-        <PhoneIcon size={16} /> Contact support
-      </button>
+      <ContactSupport variant="minimal" />
     </div>
   );
 
@@ -84,8 +83,8 @@ export default function RegisterChoicePage() {
             selected === "individual"
               ? "Continue as Individual"
               : selected === "institution"
-              ? "Continue as Institution"
-              : "Select one to Continue"
+                ? "Continue as Institution"
+                : "Select one to Continue"
           }
           className="w-full"
           onClick={handleContinue}

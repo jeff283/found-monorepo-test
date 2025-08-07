@@ -27,6 +27,7 @@ import {
   showSuccessToast,
   withErrorHandling,
 } from "@/utils/auth-error-handler";
+import ContactSupport from "@/components/authentication/ContactSupport";
 
 /**
  * Individual account registration form validation schema using Zod.
@@ -200,10 +201,7 @@ export default function IndividualRegisterPage() {
   const topBar = (
     <div className="flex justify-between items-center w-full">
       <AuthBackButton />
-      <button className="caption text-muted-foreground hover:underline flex items-center gap-1">
-        <PhoneIcon size={16} className="inline-block mr-1" />
-        Contact support
-      </button>
+      <ContactSupport variant="minimal" />
     </div>
   );
 

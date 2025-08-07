@@ -22,6 +22,7 @@ import AuthBackButton from "@/components/authentication/AuthBackButton";
 import SocialLoginButton from "@/components/authentication/SocialLoginButton";
 import AuthFooter from "@/components/authentication/AuthFooter";
 import MicrosoftLogo from "@/components/microsoft-logo";
+import ContactSupport from "@/components/authentication/ContactSupport";
 
 interface LoginFormData {
   email: string;
@@ -182,9 +183,10 @@ export default function LoginPage() {
   const topBar = (
     <div className="flex justify-between items-center w-full">
       <AuthBackButton href="https://foundlyhq.com/" />
-      <button className="caption text-muted-foreground hover:underline flex items-center gap-1">
+      {/* <button className="caption text-muted-foreground hover:underline flex items-center gap-1">
         <PhoneIcon size={16} /> Contact support
-      </button>
+      </button> */}
+      <ContactSupport variant="minimal" />
     </div>
   );
 
