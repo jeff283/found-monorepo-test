@@ -5,16 +5,56 @@ import { Context, Next } from "hono";
 import { Env } from "@/lib/bindings";
 
 /**
- * 🌐 CORS middleware with default settings
+ * 🌐 CORS middleware with security-focused origin validation
+ * Using function-based validation for wildcard domains as recommended by Hono docs
  */
 export const corsMiddleware = cors({
-  origin: [
-    "https://foundlyhq.com",
-    "https://app.foundlyhq.com",
-    "http://localhost:3000",
-    "https://*.foundlyhq.com",
-    "https://*.foundlyhq.workers.dev",
+  origin: (origin, c) => {
+    // Allow requests with no origin (like mobile apps, Postman, curl)
+    if (!origin) return "*";
+
+    // Production domains
+    if (
+      origin === "https://foundlyhq.com" ||
+      origin === "https://app.foundlyhq.com"
+    ) {
+      return origin;
+    }
+
+    // Development - localhost on any port
+    if (origin.match(/^http:\/\/localhost(:\d+)?$/)) {
+      return origin;
+    }
+
+    // Wildcard subdomains for foundlyhq.com (with protocol verification)
+    if (/^https:\/\/[\w\-]+\.foundlyhq\.com$/.test(origin)) {
+      return origin;
+    }
+
+    // Wildcard subdomains for foundlyhq.workers.dev (with protocol verification)
+    if (/^https:\/\/[\w\-]+\.foundlyhq\.workers\.dev$/.test(origin)) {
+      return origin;
+    }
+
+    // Preview deployments (Cloudflare Pages pattern)
+    // if (/^https:\/\/[\w\-]+\.foundly-monorepo\.pages\.dev$/.test(origin)) {
+    //   return origin;
+    // }
+
+    // Reject all other origins
+    return null;
+  },
+  credentials: true, // Allow credentials for authenticated requests
+  allowMethods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowHeaders: [
+    "Content-Type",
+    "Authorization",
+    "X-Requested-With",
+    "Accept",
+    "Origin",
   ],
+  exposeHeaders: ["X-Request-Id"], // Expose custom headers if you use them
+  maxAge: 86400, // Cache preflight for 24 hours
 });
 
 /**
