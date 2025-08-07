@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { User, Building2, PhoneIcon } from "lucide-react";
+import { User, Building2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import AuthLayout from "@/components/authentication/AuthLayout";

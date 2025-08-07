@@ -1,13 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import {
-  MailIcon,
-  LockIcon,
-  EyeIcon,
-  EyeOffIcon,
-  PhoneIcon,
-} from "lucide-react";
+import { useState } from "react";
+import { MailIcon, LockIcon, EyeIcon, EyeOffIcon } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

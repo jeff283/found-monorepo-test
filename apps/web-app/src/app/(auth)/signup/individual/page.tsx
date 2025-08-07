@@ -10,7 +10,6 @@ import {
   LockIcon,
   EyeIcon,
   EyeOffIcon,
-  PhoneIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSignUp } from "@clerk/nextjs";
