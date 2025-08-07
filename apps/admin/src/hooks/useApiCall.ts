@@ -14,6 +14,7 @@ export function useApiCall() {
 
       const response = await fetch(`${apiUrl}${endpoint}`, {
         ...options,
+        credentials: "include", // Include cookies for session management
         headers: {
           ...options.headers,
           Authorization: `Bearer ${token}`,
