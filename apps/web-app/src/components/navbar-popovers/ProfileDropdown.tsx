@@ -1,6 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
-import { User, Settings, FileText, LogOut } from 'lucide-react';
+'use client'
+
+import React, { useState, useEffect, useRef } from 'react'
+import Link from 'next/link'
+import Image from 'next/image'
+import { Settings, Printer , Files, LogOut } from 'lucide-react'
 
 export function ProfileDropdown({
   user,
@@ -9,20 +12,18 @@ export function ProfileDropdown({
   user: { name: string; role: string; avatar?: string };
   children?: React.ReactNode;
 }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (ref.current && !ref.current.contains(event.target as Node)) {
-        setOpen(false);
+        setOpen(false)
       }
     }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   return (
     <div className="relative" ref={ref}>
@@ -59,25 +60,37 @@ export function ProfileDropdown({
           </div>
 
           <div className="space-y-2 text-sm">
-            <div className="flex items-center gap-2 text-gray-700 hover:text-black cursor-pointer">
-              <User className="w-4 h-4" />
-              My profile
-            </div>
-            <div className="flex items-center gap-2 text-gray-700 hover:text-black cursor-pointer">
-              <Settings className="w-4 h-4" />
-              Settings
-            </div>
-            <div className="flex items-center gap-2 text-gray-700 hover:text-black cursor-pointer">
-              <FileText className="w-4 h-4" />
+            <Link
+              href="/institution/profile"
+              className="flex items-center gap-2 text-gray-700 hover:text-black"
+            >
+              <Settings className="w-5 h-5" />
+              Profile Setting
+            </Link>
+
+            <Link
+              href="/institution/profile?tab=billing"
+              className="flex items-center gap-2 text-gray-700 hover:text-black"
+            >
+              <Printer className="w-5 h-5" />
+              Payment and billings
+            </Link>
+
+            <Link
+              href="/institution/reports"
+              className="flex items-center gap-2 text-gray-700 hover:text-black"
+            >
+              <Files className="w-5 h-5" />
               Reports
-            </div>
+            </Link>
+
             <div className="flex items-center gap-2 text-red-500 hover:text-red-700 cursor-pointer pt-2 border-t">
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-5 h-5" />
               Log out
             </div>
           </div>
         </div>
       )}
     </div>
-  );
+  )
 }
