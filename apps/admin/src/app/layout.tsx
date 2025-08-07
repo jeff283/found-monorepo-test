@@ -32,21 +32,42 @@ export default function RootLayout({
 }
 
 export const metadata: Metadata = {
-  title: "Foundly Admin App",
-  description: "Smarter Lost and Found for Modern Institutions",
-  keywords: ["Lost and Found", "Institutions", "Foundly", "Smart Tracking"],
+  title: "Foundly Admin Dashboard",
+  description:
+    "Administrative dashboard for managing Foundly Internal Operations",
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+      noimageindex: true,
+      "max-video-preview": -1,
+      "max-image-preview": "none",
+      "max-snippet": -1,
+    },
+  },
+  other: {
+    google: "notranslate",
+    ChatGPT: "noindex",
+    CCBot: "nofollow",
+    "Claude-Web": "noindex",
+    Perplexity: "noindex",
+  },
   creator: "Foundly Team",
   openGraph: {
-    title: "Foundly",
-    description: "Smarter Lost and Found for Modern Institutions",
-    url: "https://app.foundlyhq.com",
-    siteName: "Foundly",
+    title: "Foundly Admin Dashboard",
+    description:
+      "Administrative dashboard for managing Foundly Internal Operations",
+    url: "https://admin.protect.foundlyhq.com",
+    siteName: "Foundly Admin",
     images: [
       {
-        url: "https://app.foundlyhq.com/og-image.png",
+        url: "https://admin.protect.foundlyhq.com/og-image.png",
         width: 500,
         height: 540,
-        alt: "Foundly - Smarter Lost and Found",
+        alt: "Foundly Admin Dashboard",
       },
     ],
     locale: "en_US",
