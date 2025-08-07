@@ -1,9 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://api.foundlyhq.com";
+import { useApiCall } from "@/admin/hooks/useApiCall";
 
 // API response wrapper type
 interface ApiResponse<T> {
@@ -53,22 +51,12 @@ interface ApplicationsResponse {
 
 // Hook to fetch admin metrics
 export function useAdminMetrics() {
+  const { get } = useApiCall();
+
   return useQuery({
     queryKey: ["admin", "metrics"],
     queryFn: async (): Promise<AdminMetrics> => {
-      const response = await fetch(
-        `${API_BASE_URL}/api/admin/institution/metrics`,
-        {
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch admin metrics");
-      }
+      const response = await get("/api/admin/institution/metrics");
 
       const result = (await response.json()) as ApiResponse<AdminMetrics>;
       if (!result.success) {
@@ -84,22 +72,14 @@ export function useAdminMetrics() {
 
 // Hook to fetch pending applications
 export function usePendingApplications() {
+  const { get } = useApiCall();
+
   return useQuery({
     queryKey: ["admin", "applications", "pending"],
     queryFn: async (): Promise<ApplicationsResponse> => {
-      const response = await fetch(
-        `${API_BASE_URL}/api/admin/institution/applications?status=pending_verification&limit=5`,
-        {
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+      const response = await get(
+        "/api/admin/institution/applications?status=pending_verification&limit=5"
       );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch pending applications");
-      }
 
       const result =
         (await response.json()) as ApiResponse<ApplicationsResponse>;
@@ -116,22 +96,14 @@ export function usePendingApplications() {
 
 // Hook to fetch recent applications (all statuses, recent first)
 export function useRecentApplications() {
+  const { get } = useApiCall();
+
   return useQuery({
     queryKey: ["admin", "applications", "recent"],
     queryFn: async (): Promise<ApplicationsResponse> => {
-      const response = await fetch(
-        `${API_BASE_URL}/api/admin/institution/applications?limit=5&sort=created_at&order=desc`,
-        {
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+      const response = await get(
+        "/api/admin/institution/applications?limit=5&sort=created_at&order=desc"
       );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch recent applications");
-      }
 
       const result =
         (await response.json()) as ApiResponse<ApplicationsResponse>;
