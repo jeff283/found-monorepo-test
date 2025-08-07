@@ -18,7 +18,7 @@
       "name": "foundly-app-preview",
       "routes": [
         {
-          "pattern": "app.foundlyhq.com",
+          "pattern": "preview.app.foundlyhq.com",
           "custom_domain": true,
         },
       ],
@@ -36,7 +36,7 @@
       "name": "foundly-app-production",
       "routes": [
         {
-          "pattern": "preview.prod.foundlyhq.com",
+          "pattern": "app.foundlyhq.com",
           "custom_domain": true,
         },
       ],

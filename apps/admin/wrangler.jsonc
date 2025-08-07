@@ -23,7 +23,7 @@
       "name": "foundly-admin-preview",
       "routes": [
         {
-          "pattern": "admin.foundlyhq.com",
+          "pattern": "preview.admin.foundlyhq.com",
           "custom_domain": true,
         },
       ],
@@ -41,7 +41,7 @@
       "name": "foundly-admin-production",
       "routes": [
         {
-          "pattern": "preview.admin.foundlyhq.com",
+          "pattern": "admin.foundlyhq.com",
           "custom_domain": true,
         },
       ],
