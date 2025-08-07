@@ -13,7 +13,6 @@ import {
   LockIcon,
   EyeIcon,
   EyeOffIcon,
-  PhoneIcon,
   InfoIcon,
   BriefcaseIcon,
 } from "lucide-react";
@@ -24,12 +23,12 @@ import AuthInput from "@/components/authentication/AuthInput";
 import AuthBackButton from "@/components/authentication/AuthBackButton";
 import FoundlyButton from "@/components/authentication/FoundlyButton";
 import AuthFooter from "@/components/authentication/AuthFooter";
-import { createClient } from "@/database/supabase/client";
 import {
   withErrorHandling,
   showSuccessToast,
 } from "@/utils/auth-error-handler";
 import ContactSupport from "@/components/authentication/ContactSupport";
+import { updateUserJobTitle } from "@/server/actions/user-metadata";
 
 /**
  * Comprehensive list of public email domains to prevent institution registration
@@ -152,46 +151,6 @@ const personalAccountSchema = z.object({
 // Type inference from schema
 type PersonalAccountForm = z.infer<typeof personalAccountSchema>;
 
-/**
- * Saves additional user information to Supabase after Clerk account creation.
- * This includes job title and any other business-specific data.
- */
-async function saveUserToSupabase({
-  userId,
-  email,
-  firstName,
-  lastName,
-  jobTitle,
-}: {
-  userId: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  jobTitle?: string;
-}) {
-  const supabase = createClient();
-
-  const { error } = await withErrorHandling(async () => {
-    const { error } = await supabase.from("user_profiles").insert({
-      clerk_user_id: userId,
-      email,
-      first_name: firstName,
-      last_name: lastName,
-      job_title: jobTitle || null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    });
-
-    if (error) {
-      throw error;
-    }
-
-    return { success: true };
-  }, "saving user profile to database");
-
-  return { success: !error, error };
-}
-
 export default function CreatePersonalAccountPage() {
   const router = useRouter();
   const { isLoaded, signUp, setActive } = useSignUp();
@@ -239,7 +198,7 @@ export default function CreatePersonalAccountPage() {
 
   /**
    * Handles the personal account creation form submission using Clerk authentication.
-   * Creates account with Clerk, sends email verification, and stores additional data in Supabase.
+   * Creates account with Clerk, sends email verification, and stores job title in public metadata.
    */
   const onSubmit = async (data: PersonalAccountForm) => {
     if (!isLoaded) return;
@@ -264,23 +223,17 @@ export default function CreatePersonalAccountPage() {
         await setActive({ session: result.createdSessionId });
       }
 
-      // Store additional user data in Supabase using Clerk's user ID
-      if (result.createdUserId) {
-        const supabaseResult = await saveUserToSupabase({
-          userId: result.createdUserId,
-          email: data.email,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          jobTitle: data.jobTitle,
-        });
+      // Update user's public metadata with job title if provided using server action
+      if (data.jobTitle) {
+        const metadataResult = await updateUserJobTitle(data.jobTitle);
 
-        if (!supabaseResult.success && supabaseResult.error) {
+        if (!metadataResult.success) {
           console.warn(
-            "Clerk account created but Supabase save failed:",
-            supabaseResult.error
+            "Clerk account created but metadata update failed:",
+            metadataResult.error
           );
           // We don't throw here since the main account was created successfully
-          // The user can still proceed, and we can retry saving the profile later
+          // The job title can be added later through the user profile
         }
       }
 
