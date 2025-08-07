@@ -36,7 +36,14 @@ export const corsMiddleware = cors({
     }
 
     // Wildcard subdomains for foundlyhq.com (with protocol verification)
+    // This handles patterns like admin.foundlyhq.com, staging.foundlyhq.com, etc.
     if (/^https:\/\/[\w\-]+\.foundlyhq\.com$/.test(origin)) {
+      return origin;
+    }
+
+    // Multi-level subdomains for foundlyhq.com (e.g., admin.protect.foundlyhq.com)
+    // This handles patterns with multiple subdomain levels
+    if (/^https:\/\/[\w\-]+\.[\w\-]+\.foundlyhq\.com$/.test(origin)) {
       return origin;
     }
 
