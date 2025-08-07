@@ -3,7 +3,7 @@ import { Env } from "@/lib/bindings";
 import { z } from "zod";
 import type { ApplicationRecord } from "@/lib/types";
 import {
-  getAuthenticatedAuth,
+  getUserInfo,
   getUserInstitutionDO,
   getAdminRegistryDO,
 } from "@/lib/auth-helpers";
@@ -28,8 +28,6 @@ const paginationSchema = z.object({
 
 // GET /api/admin/institution/applications - Get all applications with pagination
 adminInstitutionRoutes.get("/applications", async (c) => {
-  const auth = getAuthenticatedAuth(c);
-
   try {
     // Parse query parameters
     const query = c.req.query();
@@ -60,10 +58,29 @@ adminInstitutionRoutes.get("/applications", async (c) => {
     const endIndex = startIndex + limit;
     const paginatedApplications = applications.slice(startIndex, endIndex);
 
+    // Transform ApplicationRecord to match admin UI expectations
+    const transformedApplications = paginatedApplications.map(
+      (app: ApplicationRecord) => ({
+        id: app.userId, // Use userId as id for now
+        userId: app.userId,
+        userEmail: app.userEmail,
+        emailDomain: app.userEmail.split("@")[1] || "", // Extract domain from email
+        institutionName: app.institutionName,
+        institutionType: app.institutionType, // Now available from ApplicationRecord
+        status: app.status,
+        currentStep: app.currentStep,
+        createdAt: app.createdAt,
+        updatedAt: app.updatedAt,
+        reviewedBy: app.reviewedBy,
+        reviewedAt: app.reviewedAt,
+        rejectionReason: app.rejectionReason,
+      })
+    );
+
     return c.json({
       success: true,
       data: {
-        applications: paginatedApplications,
+        applications: transformedApplications,
         pagination: {
           current_page: page,
           per_page: limit,
@@ -103,8 +120,6 @@ adminInstitutionRoutes.get("/applications", async (c) => {
 
 // GET /api/admin/institution/applications/pending - Get pending applications
 adminInstitutionRoutes.get("/applications/pending", async (c) => {
-  const auth = getAuthenticatedAuth(c);
-
   try {
     const query = c.req.query();
     const { page, limit, search } = paginationSchema.parse(query);
@@ -128,10 +143,29 @@ adminInstitutionRoutes.get("/applications/pending", async (c) => {
     const endIndex = startIndex + limit;
     const paginatedApplications = applications.slice(startIndex, endIndex);
 
+    // Transform ApplicationRecord to match admin UI expectations
+    const transformedApplications = paginatedApplications.map(
+      (app: ApplicationRecord) => ({
+        id: app.userId, // Use userId as id for now
+        userId: app.userId,
+        userEmail: app.userEmail,
+        emailDomain: app.userEmail.split("@")[1] || "", // Extract domain from email
+        institutionName: app.institutionName,
+        institutionType: app.institutionType, // Now available from ApplicationRecord
+        status: app.status,
+        currentStep: app.currentStep,
+        createdAt: app.createdAt,
+        updatedAt: app.updatedAt,
+        reviewedBy: app.reviewedBy,
+        reviewedAt: app.reviewedAt,
+        rejectionReason: app.rejectionReason,
+      })
+    );
+
     return c.json({
       success: true,
       data: {
-        applications: paginatedApplications,
+        applications: transformedApplications,
         pagination: {
           current_page: page,
           per_page: limit,
@@ -156,13 +190,6 @@ adminInstitutionRoutes.get("/applications/pending", async (c) => {
 
 // GET /api/admin/institution/applications/abandoned - Get abandoned applications
 adminInstitutionRoutes.get("/applications/abandoned", async (c) => {
-  // const auth = requireAdminAuth(c);
-  // if (auth instanceof Response) return auth;
-  const auth = {
-    userId: "admin-user-id", // Replace with actual user ID from auth
-    userEmail: "example@user.email",
-  };
-
   try {
     const query = c.req.query();
     const { page, limit } = paginationSchema.parse(query);
@@ -175,10 +202,29 @@ adminInstitutionRoutes.get("/applications/abandoned", async (c) => {
     const endIndex = startIndex + limit;
     const paginatedApplications = applications.slice(startIndex, endIndex);
 
+    // Transform ApplicationRecord to match admin UI expectations
+    const transformedApplications = paginatedApplications.map(
+      (app: ApplicationRecord) => ({
+        id: app.userId, // Use userId as id for now
+        userId: app.userId,
+        userEmail: app.userEmail,
+        emailDomain: app.userEmail.split("@")[1] || "", // Extract domain from email
+        institutionName: app.institutionName,
+        institutionType: app.institutionType, // Now available from ApplicationRecord
+        status: app.status,
+        currentStep: app.currentStep,
+        createdAt: app.createdAt,
+        updatedAt: app.updatedAt,
+        reviewedBy: app.reviewedBy,
+        reviewedAt: app.reviewedAt,
+        rejectionReason: app.rejectionReason,
+      })
+    );
+
     return c.json({
       success: true,
       data: {
-        applications: paginatedApplications,
+        applications: transformedApplications,
         pagination: {
           current_page: page,
           per_page: limit,
@@ -203,13 +249,6 @@ adminInstitutionRoutes.get("/applications/abandoned", async (c) => {
 
 // GET /api/admin/institution/applications/:userId - Get specific application
 adminInstitutionRoutes.get("/applications/:userId", async (c) => {
-  // const auth = requireAdminAuth(c);
-  // if (auth instanceof Response) return auth;
-  const auth = {
-    userId: "admin-user-id", // Replace with actual user ID from auth
-    userEmail: "example@user.email",
-  };
-
   try {
     const userId = c.req.param("userId");
 
@@ -244,18 +283,13 @@ adminInstitutionRoutes.get("/applications/:userId", async (c) => {
 
 // POST /api/admin/institution/applications/:userId/action - Approve or reject application
 adminInstitutionRoutes.post("/applications/:userId/action", async (c) => {
-  // const auth = requireAdminAuth(c);
-  // if (auth instanceof Response) return auth;
-  const auth = {
-    userId: "admin-user-id", // Replace with actual user ID from auth
-    userEmail: "example@user.email",
-  };
+  const { userId: adminUserId } = await getUserInfo(c);
 
   try {
     const userId = c.req.param("userId");
     const body = await c.req.json();
 
-    if (!userId) {
+    if (!adminUserId) {
       return c.json(
         {
           success: false,
@@ -272,10 +306,10 @@ adminInstitutionRoutes.post("/applications/:userId/action", async (c) => {
 
     let result;
     if (action === "approve") {
-      result = await institutionDO.approveApplication(auth.userId);
+      result = await institutionDO.approveApplication(adminUserId);
     } else {
       result = await institutionDO.rejectApplication(
-        auth.userId,
+        adminUserId,
         reason || "No reason provided"
       );
     }
@@ -310,13 +344,6 @@ adminInstitutionRoutes.post("/applications/:userId/action", async (c) => {
 
 // GET /api/admin/institution/metrics - Get application metrics
 adminInstitutionRoutes.get("/metrics", async (c) => {
-  // const auth = requireAdminAuth(c);
-  // if (auth instanceof Response) return auth;
-  const auth = {
-    userId: "admin-user-id", // Replace with actual user ID from auth
-    userEmail: "example@user.email",
-  };
-
   try {
     const adminRegistryDO = getAdminRegistryDO(c);
     const allApplications = await adminRegistryDO.getAllApplications();
@@ -366,12 +393,7 @@ adminInstitutionRoutes.get("/metrics", async (c) => {
 
 // POST /api/admin/institution/applications/bulk-action - Bulk approve/reject applications
 adminInstitutionRoutes.post("/applications/bulk-action", async (c) => {
-  // const auth = requireAdminAuth(c);
-  // if (auth instanceof Response) return auth;
-  const auth = {
-    userId: "admin-user-id", // Replace with actual user ID from auth
-    userEmail: "admin@user.email",
-  };
+  const { userId: adminUserId } = await getUserInfo(c);
 
   try {
     const body = await c.req.json();
@@ -395,10 +417,10 @@ adminInstitutionRoutes.post("/applications/bulk-action", async (c) => {
 
         let result;
         if (action === "approve") {
-          result = await institutionDO.approveApplication(auth.userId);
+          result = await institutionDO.approveApplication(adminUserId);
         } else {
           result = await institutionDO.rejectApplication(
-            auth.userId,
+            adminUserId,
             reason || "Bulk action"
           );
         }

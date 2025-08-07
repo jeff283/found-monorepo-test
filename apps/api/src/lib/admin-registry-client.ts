@@ -25,7 +25,8 @@ export class AdminRegistryClient {
         data.userId,
         data.userEmail,
         data.institutionName || "",
-        data.status
+        data.status,
+        data.institutionType
       );
     } catch (error) {
       console.error("Error registering institution reference:", error);
@@ -41,6 +42,7 @@ export class AdminRegistryClient {
       await registryStub.updateInstitutionReference(data.userId, {
         status: data.status,
         institutionName: data.institutionName,
+        institutionType: data.institutionType,
       });
     } catch (error) {
       console.error("Error updating institution reference:", error);

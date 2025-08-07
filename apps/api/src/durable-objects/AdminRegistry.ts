@@ -6,6 +6,7 @@ import type {
   LegacyRegistryData,
   InstitutionReference,
   InstitutionStatus,
+  InstitutionType,
 } from "@/lib/types";
 
 export class AdminRegistryDO extends DurableObject {
@@ -95,7 +96,8 @@ export class AdminRegistryDO extends DurableObject {
     userId: string,
     userEmail: string,
     institutionName: string,
-    status: InstitutionStatus
+    status: InstitutionStatus,
+    institutionType?: InstitutionType
   ): Promise<InstitutionReference> {
     const registryData = await this.getRegistryData();
 
@@ -113,6 +115,7 @@ export class AdminRegistryDO extends DurableObject {
       userEmail,
       emailDomain,
       institutionName,
+      institutionType,
       status,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -128,7 +131,12 @@ export class AdminRegistryDO extends DurableObject {
   // Update an existing institution reference
   async updateInstitutionReference(
     userId: string,
-    updates: Partial<Pick<InstitutionReference, "status" | "institutionName">>
+    updates: Partial<
+      Pick<
+        InstitutionReference,
+        "status" | "institutionName" | "institutionType"
+      >
+    >
   ): Promise<InstitutionReference> {
     const registryData = await this.getRegistryData();
     const existingReference = registryData.references[userId];
@@ -190,6 +198,7 @@ export class AdminRegistryDO extends DurableObject {
       userId: ref.userId,
       userEmail: ref.userEmail,
       institutionName: ref.institutionName,
+      institutionType: ref.institutionType,
       status: ref.status,
       currentStep: "organization" as const, // Default fallback
       createdAt: ref.createdAt,
@@ -205,6 +214,7 @@ export class AdminRegistryDO extends DurableObject {
       userId: ref.userId,
       userEmail: ref.userEmail,
       institutionName: ref.institutionName,
+      institutionType: ref.institutionType,
       status: ref.status,
       currentStep: "organization" as const, // Default fallback
       createdAt: ref.createdAt,
@@ -224,6 +234,7 @@ export class AdminRegistryDO extends DurableObject {
       userId: ref.userId,
       userEmail: ref.userEmail,
       institutionName: ref.institutionName,
+      institutionType: ref.institutionType,
       status: ref.status,
       currentStep: "organization" as const, // Default fallback
       createdAt: ref.createdAt,
@@ -239,6 +250,7 @@ export class AdminRegistryDO extends DurableObject {
       userId: reference.userId,
       userEmail: reference.userEmail,
       institutionName: reference.institutionName,
+      institutionType: reference.institutionType,
       status: reference.status,
       currentStep: "organization" as const, // Default fallback
       createdAt: reference.createdAt,
@@ -257,13 +269,15 @@ export class AdminRegistryDO extends DurableObject {
       userId,
       userEmail,
       institutionName,
-      status
+      status,
+      undefined // institutionType - will be set later when org step is completed
     );
 
     return {
       userId: reference.userId,
       userEmail: reference.userEmail,
       institutionName: reference.institutionName,
+      institutionType: reference.institutionType,
       status: reference.status,
       currentStep: "organization" as const,
       createdAt: reference.createdAt,
@@ -275,14 +289,19 @@ export class AdminRegistryDO extends DurableObject {
     userId: string,
     updates: Partial<ApplicationRecord>
   ): Promise<ApplicationRecord> {
-    // Only update status and institutionName from the updates
+    // Only update status, institutionName, and institutionType from the updates
     const referenceUpdates: Partial<
-      Pick<InstitutionReference, "status" | "institutionName">
+      Pick<
+        InstitutionReference,
+        "status" | "institutionName" | "institutionType"
+      >
     > = {};
 
     if (updates.status) referenceUpdates.status = updates.status;
     if (updates.institutionName)
       referenceUpdates.institutionName = updates.institutionName;
+    if (updates.institutionType)
+      referenceUpdates.institutionType = updates.institutionType;
 
     const reference = await this.updateInstitutionReference(
       userId,
@@ -293,6 +312,7 @@ export class AdminRegistryDO extends DurableObject {
       userId: reference.userId,
       userEmail: reference.userEmail,
       institutionName: reference.institutionName,
+      institutionType: reference.institutionType,
       status: reference.status,
       currentStep: "organization" as const,
       createdAt: reference.createdAt,
@@ -351,6 +371,7 @@ export class AdminRegistryDO extends DurableObject {
           userId: ref.userId,
           userEmail: ref.userEmail,
           institutionName: ref.institutionName,
+          institutionType: ref.institutionType,
           status: ref.status,
           currentStep: "organization" as const,
           createdAt: ref.createdAt,
@@ -359,13 +380,13 @@ export class AdminRegistryDO extends DurableObject {
       } else if (status) {
         applications = await this.getApplicationsByStatus(status);
       } else if (emailDomain) {
-        const references = await this.getInstitutionReferencesByDomain(
-          emailDomain
-        );
+        const references =
+          await this.getInstitutionReferencesByDomain(emailDomain);
         applications = references.map((ref) => ({
           userId: ref.userId,
           userEmail: ref.userEmail,
           institutionName: ref.institutionName,
+          institutionType: ref.institutionType,
           status: ref.status,
           currentStep: "organization" as const,
           createdAt: ref.createdAt,
@@ -409,7 +430,8 @@ export class AdminRegistryDO extends DurableObject {
         requestData.userId,
         requestData.userEmail,
         requestData.institutionName || "",
-        requestData.status || "draft"
+        requestData.status || "draft",
+        requestData.institutionType
       );
 
       // Convert to ApplicationRecord format for response
@@ -417,6 +439,7 @@ export class AdminRegistryDO extends DurableObject {
         userId: newReference.userId,
         userEmail: newReference.userEmail,
         institutionName: newReference.institutionName,
+        institutionType: newReference.institutionType,
         status: newReference.status,
         currentStep: "organization",
         createdAt: newReference.createdAt,
@@ -448,12 +471,17 @@ export class AdminRegistryDO extends DurableObject {
 
       // Use the new reference-based method
       const referenceUpdates: Partial<
-        Pick<InstitutionReference, "status" | "institutionName">
+        Pick<
+          InstitutionReference,
+          "status" | "institutionName" | "institutionType"
+        >
       > = {};
 
       if (requestData.status) referenceUpdates.status = requestData.status;
       if (requestData.institutionName)
         referenceUpdates.institutionName = requestData.institutionName;
+      if (requestData.institutionType)
+        referenceUpdates.institutionType = requestData.institutionType;
 
       const updatedReference = await this.updateInstitutionReference(
         requestData.userId,
@@ -465,6 +493,7 @@ export class AdminRegistryDO extends DurableObject {
         userId: updatedReference.userId,
         userEmail: updatedReference.userEmail,
         institutionName: updatedReference.institutionName,
+        institutionType: updatedReference.institutionType,
         status: updatedReference.status,
         currentStep: "organization",
         createdAt: updatedReference.createdAt,

@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { Host_Grotesk } from "next/font/google";
 import { Toaster } from "@/admin/components/ui/sonner";
 import { ClerkProvider } from "@clerk/nextjs";
+import { QueryProvider } from "@/admin/components/providers/query-provider";
 
 const hostGrotesk = Host_Grotesk({
   variable: "--font-host-grotesk",
@@ -20,8 +21,10 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body className={`${hostGrotesk.variable} antialiased`}>
-          <Toaster richColors position="top-center" />
-          {children}
+          <QueryProvider>
+            <Toaster richColors position="top-center" />
+            {children}
+          </QueryProvider>
         </body>
       </html>
     </ClerkProvider>
@@ -29,7 +32,7 @@ export default function RootLayout({
 }
 
 export const metadata: Metadata = {
-  title: "Foundly App",
+  title: "Foundly Admin App",
   description: "Smarter Lost and Found for Modern Institutions",
   keywords: ["Lost and Found", "Institutions", "Foundly", "Smart Tracking"],
   creator: "Foundly Team",

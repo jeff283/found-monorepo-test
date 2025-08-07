@@ -7,13 +7,15 @@ export {
   type UpdateInstitutionDraftRequest,
   type InstitutionStatus,
   type InstitutionStep,
-} from "@/lib/schemas";
+  type InstitutionType,
+} from "./schemas";
 
 import type {
   InstitutionDraftData,
   InstitutionStatus,
   InstitutionStep,
-} from "@/lib/schemas";
+  InstitutionType,
+} from "./schemas";
 
 // API Response types
 export interface ApiResponse<T = any> {
@@ -54,6 +56,7 @@ export interface InstitutionReference {
   emailDomain: string; // For domain-based search
   userEmail: string; // Keep for admin display
   institutionName?: string; // Basic search metadata only
+  institutionType?: InstitutionType; // For admin filtering and display
   status: InstitutionStatus; // For filtering
   createdAt: string;
   updatedAt: string;
@@ -64,6 +67,7 @@ export interface ApplicationRecord {
   userId: string;
   userEmail: string;
   institutionName?: string;
+  institutionType?: InstitutionType;
   status: InstitutionStatus;
   currentStep: InstitutionStep;
   createdAt: string;
@@ -82,4 +86,48 @@ export interface RegistryData {
 export interface LegacyRegistryData {
   applications: Record<string, ApplicationRecord>; // userId -> ApplicationRecord
   lastUpdated: string;
+}
+
+// Admin UI types - for frontend consumption
+export interface InstitutionApplication {
+  id: string;
+  userId: string;
+  userEmail: string;
+  emailDomain: string;
+  institutionName?: string;
+  institutionType?: InstitutionType;
+  status: InstitutionStatus;
+  currentStep: InstitutionStep;
+  createdAt: string;
+  updatedAt: string;
+  reviewedBy?: string;
+  reviewedAt?: string;
+  rejectionReason?: string;
+}
+
+export interface InstitutionMetricsData {
+  total_applications: number;
+  pending_applications: number;
+  approved_applications: number;
+  rejected_applications: number;
+  abandoned_applications: number;
+  approval_rate: string;
+}
+
+export interface PaginationData {
+  current_page: number;
+  per_page: number;
+  total_count: number;
+  total_pages: number;
+  has_next_page: boolean;
+  has_prev_page: boolean;
+}
+
+export interface ApplicationsResponse {
+  applications: InstitutionApplication[];
+  pagination: PaginationData;
+  filters?: {
+    status?: string;
+    search?: string;
+  };
 }

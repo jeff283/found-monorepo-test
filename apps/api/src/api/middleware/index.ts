@@ -3,7 +3,16 @@ import { logger } from "hono/logger";
 import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
 import { Context, Next } from "hono";
 import { Env } from "@/lib/bindings";
+import { getUserInfo } from "@/lib/auth-helpers";
+import { z } from "zod";
 
+// Lightweight Zod schema for admin email validation
+const adminEmailSchema = z
+  .string()
+  .email("Invalid email format")
+  .refine((email) => email.endsWith("@foundlyhq.com"), {
+    message: "Admin access requires @foundlyhq.com email address",
+  });
 /**
  * 🌐 CORS middleware with security-focused origin validation
  * Using function-based validation for wildcard domains as recommended by Hono docs
@@ -90,7 +99,7 @@ export const requireAuthMiddleware = async (
 
 /**
  * 🔐 Admin authentication middleware that requires admin privileges
- * TODO: Implement proper admin role checking
+ * Only allows users with @foundlyhq.com email addresses
  */
 export const requireAdminMiddleware = async (
   c: Context<{ Bindings: Env }>,
@@ -109,12 +118,42 @@ export const requireAdminMiddleware = async (
     );
   }
 
-  // TODO: Add proper admin role checking here
-  // For now, we'll just check authentication
-  // In the future, you might check:
-  // - Check user role from database
-  // - Check Clerk organization permissions
-  // - Check against allowlist of admin user IDs
+  try {
+    // Get user info to check if they are an admin
+    const { userEmail } = await getUserInfo(c);
 
-  await next();
+    // Validate email domain using Zod schema
+    const validationResult = adminEmailSchema.safeParse(userEmail);
+
+    if (!validationResult.success) {
+      // Log unauthorized access attempt
+      console.warn(
+        `Admin access denied for user ${auth.userId} with email ${userEmail}: ${validationResult.error.issues[0]?.message}`
+      );
+
+      return c.json(
+        {
+          success: false,
+          error: "Admin access denied",
+          message:
+            "Only @foundlyhq.com email addresses are authorized for admin access",
+        },
+        403
+      );
+    }
+
+    // User has valid admin email, proceed
+    await next();
+  } catch (error) {
+    console.error(`Admin middleware error for user ${auth.userId}:`, error);
+
+    return c.json(
+      {
+        success: false,
+        error: "Admin validation failed",
+        message: "Unable to verify admin privileges",
+      },
+      500
+    );
+  }
 };

@@ -51,9 +51,8 @@ app.route("/api/user/institution", userInstitutionRoutes);
 
 // 🔐 Apply additional admin middleware to admin routes
 app.use("/api/admin/*", requireAdminMiddleware);
-//  API Route
-// TODO: Implement admin authentication and authorization
-// app.route("/api/admin/institution", adminInstitutionRoutes);
+//  Admin API Route
+app.route("/api/admin/institution", adminInstitutionRoutes);
 
 export default app;
 

@@ -1,5 +1,19 @@
 import { z } from "zod";
 
+// Centralized Institution Type Schema
+export const institutionTypeSchema = z.enum([
+  "university",
+  "college",
+  "research",
+  "nonprofit",
+  "government",
+  "corporate",
+  "other",
+]);
+
+// Export the inferred type for use throughout the codebase
+export type InstitutionType = z.infer<typeof institutionTypeSchema>;
+
 // Zod schemas for validation
 
 // Organization step validation (Step 1)
@@ -10,17 +24,10 @@ export const organizationStepSchema = z.object({
     .min(2, "Organization name must be at least 2 characters")
     .max(100, "Organization name must be less than 100 characters"),
 
-  organizationType: z
-    .enum([
-      "university",
-      "college",
-      "research",
-      "nonprofit",
-      "government",
-      "corporate",
-      "other",
-    ])
-    .refine((val) => val !== undefined, "Please select an organization type"),
+  organizationType: institutionTypeSchema.refine(
+    (val) => val !== undefined,
+    "Please select an organization type"
+  ),
 
   organizationSize: z
     .enum(["1-10", "11-100", "101-1000", "1001-10000", "10000+"])
@@ -102,17 +109,7 @@ export const institutionDraftDataSchema = z.object({
 
   // Organization details (Step 1)
   institutionName: z.string().optional(),
-  institutionType: z
-    .enum([
-      "university",
-      "college",
-      "research",
-      "nonprofit",
-      "government",
-      "corporate",
-      "other",
-    ])
-    .optional(),
+  institutionType: institutionTypeSchema.optional(),
   organizationSize: z
     .enum(["1-10", "11-100", "101-1000", "1001-10000", "10000+"])
     .optional(),
@@ -136,6 +133,7 @@ export const institutionDraftDataSchema = z.object({
   // Timestamps
   createdAt: z.string(),
   updatedAt: z.string(),
+  submittedAt: z.string().optional(),
 
   // Admin actions
   reviewedBy: z.string().optional(),

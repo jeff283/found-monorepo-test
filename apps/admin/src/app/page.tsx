@@ -1,16 +1,16 @@
-"use client";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
-import FoundlyButton from "@/admin/components/custom/FoundlyButton";
+export default async function HomePage() {
+  // Get the userId from auth() -- if null, the user is not signed in
+  const { userId } = await auth();
 
-export default function Home() {
-  return (
-    <main className="flex justify-center items-center h-screen flex-col">
-      <div className="flex flex-col items-center gap-4">
-        <h1 className="title-1">Hello Admin</h1>
-        <FoundlyButton variant="default" href="https://foundlyhq.com">
-          Click Him
-        </FoundlyButton>
-      </div>
-    </main>
-  );
+  // If not signed in, redirect to login
+  if (!userId) {
+    redirect("/login");
+  }
+
+  // If signed in, redirect to the protected dashboard
+  // The protected layout will handle email domain validation
+  redirect("/dashboard");
 }
