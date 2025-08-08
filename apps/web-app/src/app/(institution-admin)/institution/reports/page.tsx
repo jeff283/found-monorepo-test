@@ -1,20 +1,24 @@
+'use client';
 
 import { ItemsChart } from '@/components/common/items-chart';
 import { ReportTable } from '@/components/institution-dashboard/reports/reports-finds-table';
-import { DashboardHeader } from '@/components/institution-dashboard/dashboard-header';
+import { DashboardHeader } from '@/components/common/dashboard-header';
+import {
+  defaultUser,
+  defaultNavItems,
+  ProfileDropdownContent,
+} from '@/components/institution-dashboard/dashboard-header.config';
 import { Search, Users, FileText } from 'lucide-react';
-//import { ReportTable } from '@/components/institution-dashboard/report-table';
 
-// Sample chart data
 const monthlyData = [
   { name: "Jan", last: 40, current: 40 },
-  { name: "Feb", last: 45, current: 70 }, 
-  { name: "Mar", last: 35, current: 140 }, 
-  { name: "Apr", last: 50, current: 70 }, 
-  { name: "May", last: 40, current: 50 }, 
-  { name: "Jun", last: 55, current: 60 }, 
-  { name: "Jul", last: 60, current: 50 }, 
-  { name: "Aug", last: 50, current: 65 }, 
+  { name: "Feb", last: 45, current: 70 },
+  { name: "Mar", last: 35, current: 140 },
+  { name: "Apr", last: 50, current: 70 },
+  { name: "May", last: 40, current: 50 },
+  { name: "Jun", last: 55, current: 60 },
+  { name: "Jul", last: 60, current: 50 },
+  { name: "Aug", last: 50, current: 65 },
 ];
 
 const weeklyData = [
@@ -33,14 +37,6 @@ const dailyData = [
   { name: "Sat", last: 190, current: 80 },
   { name: "Sun", last: 8, current: 50 },
 ];
-            
-
-const mockUser = {
-  name: "Victor Musembi",
-  role: "Institution Admin",
-  avatar: "/avatars/avatar-1.webp",
-};
-
 
 const reportStats = [
   {
@@ -66,7 +62,6 @@ const reportStats = [
   },
 ];
 
-
 function ReportStatsCards({ stats }: { stats: typeof reportStats }) {
   return (
     <div className="flex flex-col gap-y-14 p-6 ml-4 md:ml-8">
@@ -88,14 +83,18 @@ function ReportStatsCards({ stats }: { stats: typeof reportStats }) {
 export default function ReportsPage() {
   return (
     <div>
-      <DashboardHeader user={mockUser} />
+      <DashboardHeader
+        user={defaultUser}
+        navItems={defaultNavItems}
+        profileDropdown={ProfileDropdownContent(defaultUser)}
+      />
       <main className="p-6 md:p-10 space-y-8">
         <div className="flex flex-col md:flex-row gap-6 items-start">
           <div className="w-full md:w-1/3 max-w-xs">
             <ReportStatsCards stats={reportStats} />
           </div>
           <div className="flex-1">
-            <ItemsChart 
+            <ItemsChart
               title="Overview Chart"
               subtitle="Monthly lost & found activity"
               legendLast="Lost Item"

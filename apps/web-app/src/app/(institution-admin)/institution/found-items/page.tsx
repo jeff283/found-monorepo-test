@@ -1,16 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { DashboardHeader } from '@/components/institution-dashboard/dashboard-header';
+import { DashboardHeader } from '@/components/common/dashboard-header';
+import {
+  defaultUser,
+  defaultNavItems,
+  ProfileDropdownContent,
+} from '@/components/institution-dashboard/dashboard-header.config';
 import { TableHeader } from '@/components/found-items/TableHeader';
 import { RecordsTable } from '@/components/found-items/RecordsTable';
 import { FilterValues } from '@/components/found-items/FilterDropdown';
-
-const mockUser = {
-  name: "Victor Musembi",
-  role: "Institution Admin",
-  avatar: "/avatars/avatar-1.webp",
-};
 
 const sampleData = Array(42).fill(null).map((_, i) => ({
   id: `#24${i + 1}`,
@@ -39,9 +38,12 @@ export default function FoundItemsPage() {
 
   return (
     <div>
-      <DashboardHeader user={mockUser} />
+      <DashboardHeader
+        user={defaultUser}
+        navItems={defaultNavItems}
+        profileDropdown={ProfileDropdownContent(defaultUser)}
+      />
       <main className="p-6 md:p-10">
-        {/* <h1 className="title-2 mb-6">Found Items</h1> */}
         <TableHeader onFilterApply={handleApplyFilter} />
         <RecordsTable data={filteredData} />
       </main>

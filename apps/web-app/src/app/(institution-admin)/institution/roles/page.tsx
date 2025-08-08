@@ -1,21 +1,24 @@
 'use client';
 
-import { DashboardHeader } from '@/components/institution-dashboard/dashboard-header';
+import { DashboardHeader } from '@/components/common/dashboard-header';
+import {
+  defaultUser,
+  defaultNavItems,
+  ProfileDropdownContent,
+} from '@/components/institution-dashboard/dashboard-header.config';
 import RolesTable, { sampleRoles } from '@/components/institution-dashboard/roles/RolesTable';
 import { TableHeader } from '@/components/institution-dashboard/roles/TableHeader';
-
-const mockUser = {
-  name: "Victor Musembi",
-  role: "Institution Admin",
-  avatar: "/avatars/avatar-1.webp",
-};
 
 export default function RolesPage() {
   return (
     <>
-      <DashboardHeader user={mockUser} />
+      <DashboardHeader
+        user={defaultUser}
+        navItems={defaultNavItems}
+        profileDropdown={ProfileDropdownContent(defaultUser)}
+      />
       <main className="p-6 md:p-10">
-        <TableHeader/>
+        <TableHeader />
         <div className="mt-8">
           <RolesTable roles={sampleRoles} />
         </div>

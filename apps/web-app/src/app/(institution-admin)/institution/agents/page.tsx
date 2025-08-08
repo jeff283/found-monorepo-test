@@ -4,7 +4,12 @@ import { useState } from 'react';
 import Link from 'next/link';
 import AgentCard from '@/components/institution-dashboard/agents/AgentCard';
 import { Pagination } from '@/components/shared/Pagination';
-import { DashboardHeader } from '@/components/institution-dashboard/dashboard-header';
+import { DashboardHeader } from '@/components/common/dashboard-header';
+import {
+  defaultUser,
+  defaultNavItems,
+  ProfileDropdownContent,
+} from '@/components/institution-dashboard/dashboard-header.config';
 import { Filter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { AddAgentPopover } from '@/components/institution-dashboard/agents/AddAgentDialog';
@@ -67,11 +72,9 @@ export default function AgentsPage() {
   return (
     <>
       <DashboardHeader
-        user={{
-          name: "Victor Musembi",
-          role: "Institution Admin",
-          avatar: "/avatars/avatar-1.webp",
-        }}
+        user={defaultUser}
+        navItems={defaultNavItems}
+        profileDropdown={ProfileDropdownContent(defaultUser)}
       />
       <div className="w-full flex justify-center bg-background min-h-[982px] px-2 sm:px-4">
         <div className="w-full max-w-[1295px] min-h-[776px] py-6 space-y-6 relative">
@@ -96,9 +99,7 @@ export default function AgentsPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[15px]">
             {agents.map((agent) => (
-
               <Link key={agent.id} href={`/institution/agents/${agent.id}`} className="block">
-
                 <AgentCard
                   name={agent.name}
                   email={agent.email}

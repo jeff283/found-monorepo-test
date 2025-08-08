@@ -12,7 +12,12 @@ import {
   ChevronDown,
 } from 'lucide-react';
 
-import { DashboardHeader } from '@/components/institution-dashboard/dashboard-header';
+import { DashboardHeader } from '@/components/common/dashboard-header';
+import {
+  defaultUser,
+  defaultNavItems,
+  ProfileDropdownContent,
+} from '@/components/institution-dashboard/dashboard-header.config';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DataTable } from '@/components/shared/DataTable';
@@ -189,11 +194,9 @@ export default function AgentProfilePage(props: {
   return (
     <div>
       <DashboardHeader
-        user={{
-          name: 'Victor Musembi',
-          role: 'Institution Admin',
-          avatar: '/avatars/avatar-1.webp',
-        }}
+        user={defaultUser}
+        navItems={defaultNavItems}
+        profileDropdown={ProfileDropdownContent(defaultUser)}
       />
 
       <div className="px-4 sm:px-6 lg:px-8 pt-4 pb-2 max-w-6xl mx-auto">
