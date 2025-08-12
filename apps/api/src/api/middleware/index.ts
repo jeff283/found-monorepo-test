@@ -8,7 +8,6 @@ import { z } from "zod";
 
 // Lightweight Zod schema for admin email validation
 const adminEmailSchema = z
-  .string()
   .email("Invalid email format")
   .refine((email) => email.endsWith("@foundlyhq.com"), {
     message: "Admin access requires @foundlyhq.com email address",

@@ -11,7 +11,6 @@ import {
   getUserInfo,
   getUserInstitutionDO,
 } from "@/lib/auth-helpers";
-import { canUserUpdateInstitution } from "@/lib/update-permissions";
 
 const userInstitutionRoutes = new Hono<{ Bindings: Env }>();
 
@@ -329,9 +328,8 @@ userInstitutionRoutes.put("/verification", async (c) => {
     const institutionDO = getUserInstitutionDO(c, auth.userId);
 
     // The DO will handle all permission and prerequisite checks
-    const result = await institutionDO.updateVerificationDataOnly(
-      validatedData
-    );
+    const result =
+      await institutionDO.updateVerificationDataOnly(validatedData);
 
     return c.json({
       success: true,
