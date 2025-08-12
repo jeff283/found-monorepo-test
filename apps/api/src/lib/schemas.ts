@@ -104,7 +104,7 @@ export const institutionStepSchema = z.enum([
 export const institutionDraftDataSchema = z.object({
   // User identification
   userId: z.string(),
-  userEmail: z.string().email(),
+  userEmail: z.email(),
   emailDomain: z.string(),
 
   // Organization details (Step 1)
@@ -148,6 +148,8 @@ export const institutionDraftDataSchema = z.object({
   syncedToSupabase: z.boolean().optional(),
   syncedAt: z.string().optional(),
 });
+
+export const KVDomainCache = z.object({});
 
 // Type inference from schemas
 export type OrganizationStepData = z.infer<typeof organizationStepSchema>;

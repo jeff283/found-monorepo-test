@@ -60,6 +60,7 @@ export class InstitutionUpdatePermissions {
   } {
     // Define valid status transitions
     const validTransitions: Record<InstitutionStatus, InstitutionStatus[]> = {
+      created: [], // No transitions allowed from 'created' status
       draft: ["pending_verification"],
       pending_verification: ["verifying", "rejected"],
       verifying: ["approved", "rejected", "pending_verification"],

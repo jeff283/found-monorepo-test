@@ -7,6 +7,9 @@ import {
   getUserInstitutionDO,
   getAdminRegistryDO,
 } from "@/lib/auth-helpers";
+import { InstitutionDraftData } from "@/lib/schemas";
+import { sendApplicationApproveStatus } from "@/emails/SendApplicationAction";
+import { Resend } from "resend";
 
 const adminInstitutionRoutes = new Hono<{ Bindings: Env }>();
 
@@ -304,9 +307,13 @@ adminInstitutionRoutes.post("/applications/:userId/action", async (c) => {
 
     const institutionDO = getUserInstitutionDO(c, userId);
 
-    let result;
+    let result: InstitutionDraftData;
     if (action === "approve") {
       result = await institutionDO.approveApplication(adminUserId);
+      // send approval email
+      // Todo: Handle email send errors
+      const emailResult = await sendApplicationApproveStatus(c, result);
+      console.log("Email send result:", emailResult);
     } else {
       result = await institutionDO.rejectApplication(
         adminUserId,

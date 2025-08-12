@@ -7,8 +7,6 @@ import {
   VerificationStepData,
 } from "@/lib/types";
 import {
-  isOrganizationStepData,
-  isVerificationStepData,
   validateCreateRequest,
   validateUpdateRequest,
   validateOrganizationData,
