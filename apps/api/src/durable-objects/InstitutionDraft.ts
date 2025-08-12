@@ -300,6 +300,49 @@ export class InstitutionDraftDO extends DurableObject {
     return rejectedDraft;
   }
 
+  // Admin unapprove application
+  async unapproveApplication(
+    reviewedBy: string,
+    reason?: string
+  ): Promise<InstitutionDraftData> {
+    const existingData = (await this.storage.get(
+      InstitutionDraftDO.DATA_KEY
+    )) as InstitutionDraftData | undefined;
+
+    if (!existingData) {
+      throw new Error("No institution draft found to unapprove");
+    }
+
+    if (
+      existingData.status !== "approved" &&
+      existingData.status !== "created"
+    ) {
+      throw new Error(
+        "Only approved or created applications can be unapproved"
+      );
+    }
+
+    // Revert to pending_verification
+    const unapprovedDraft: InstitutionDraftData = {
+      ...existingData,
+      status: "pending_verification",
+      reviewedBy,
+      reviewedAt: new Date().toISOString(),
+      rejectionReason: reason || undefined,
+      updatedAt: new Date().toISOString(),
+    };
+
+    // Remove Clerk org details if present
+    // delete unapprovedDraft.clerkOrgId;
+    // delete unapprovedDraft.clerkOrgSlug;
+
+    await Promise.all([
+      this.storage.put(InstitutionDraftDO.DATA_KEY, unapprovedDraft),
+      this.adminRegistry.updateApplication(unapprovedDraft),
+    ]);
+
+    return unapprovedDraft;
+  }
   // Add Clerk organization details
   async addClerkOrganizationDetails(
     clerkOrgId: string,

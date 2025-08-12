@@ -123,7 +123,7 @@ export function useInstitutionApplication(userId: string) {
   });
 }
 
-// Hook for approving/rejecting applications
+// Hook for approving/rejecting/unapproving applications
 export function useApplicationAction() {
   const { post } = useApiCall();
   const queryClient = useQueryClient();
@@ -136,18 +136,30 @@ export function useApplicationAction() {
       notes,
     }: {
       userId: string;
-      action: "approve" | "reject";
+      action: "approve" | "reject" | "unapprove";
       reason?: string;
       notes?: string;
     }) => {
-      const response = await post(
-        `/api/admin/institution/applications/${userId}/action`,
-        {
-          action,
-          reason,
-          notes,
-        }
-      );
+      let response: Response;
+
+      if (action === "unapprove") {
+        response = await post(
+          `/api/admin/institution/applications/${userId}/unapprove`,
+          {
+            reason,
+          }
+        );
+      } else {
+        response = await post(
+          `/api/admin/institution/applications/${userId}/action`,
+          {
+            action,
+            reason,
+            notes,
+          }
+        );
+      }
+
       const data: ApiResponse = await response.json();
 
       if (!data.success) {

@@ -105,6 +105,21 @@ export default function InstitutionDetailPage({
     });
   };
 
+  const handleUnapprove = () => {
+    if (!institution) return;
+
+    const reason = prompt(
+      "Please provide a reason for unapproving this institution:"
+    );
+    if (!reason) return;
+
+    performAction({
+      userId: resolvedParams.id,
+      action: "unapprove",
+      reason,
+    });
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString("en-US", {
       year: "numeric",
@@ -292,6 +307,21 @@ export default function InstitutionDetailPage({
                       disabled={isProcessing}
                       className="shadow-sm"
                     />
+                  </div>
+                )}
+                {/* Unapprove Button for Approved Applications  */}
+                {(institution.status === "approved" ||
+                  institution.status === "created") && (
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <Button
+                      variant="outline"
+                      onClick={handleUnapprove}
+                      disabled={isProcessing}
+                      className="border-orange-200 text-orange-600 hover:bg-orange-50 hover:border-orange-300"
+                    >
+                      <AlertTriangle className="h-4 w-4 mr-2" />
+                      Unapprove Institution
+                    </Button>
                   </div>
                 )}
               </div>

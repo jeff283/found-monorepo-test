@@ -349,6 +349,59 @@ adminInstitutionRoutes.post("/applications/:userId/action", async (c) => {
   }
 });
 
+// POST /api/admin/institution/applications/:userId/unapprove - Unapprove application
+adminInstitutionRoutes.post("/applications/:userId/unapprove", async (c) => {
+  const { userId: adminUserId } = await getUserInfo(c);
+
+  try {
+    const userId = c.req.param("userId");
+    const body = await c.req.json();
+
+    if (!adminUserId) {
+      return c.json(
+        {
+          success: false,
+          error: "User ID is required",
+        },
+        400
+      );
+    }
+
+    const reason = body.reason || undefined;
+    const institutionDO = getUserInstitutionDO(c, userId);
+    const result = await institutionDO.unapproveApplication(
+      adminUserId,
+      reason
+    );
+
+    return c.json({
+      success: true,
+      data: result,
+      message: "Application unapproved successfully",
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return c.json(
+        {
+          success: false,
+          error: "Invalid unapprove data",
+          details: error.issues,
+        },
+        400
+      );
+    }
+
+    console.error("Error processing admin unapprove action:", error);
+    return c.json(
+      {
+        success: false,
+        error: "Failed to process admin unapprove action",
+      },
+      500
+    );
+  }
+});
+
 // GET /api/admin/institution/metrics - Get application metrics
 adminInstitutionRoutes.get("/metrics", async (c) => {
   try {
