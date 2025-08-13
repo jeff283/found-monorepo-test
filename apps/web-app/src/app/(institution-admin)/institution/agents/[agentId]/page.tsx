@@ -201,7 +201,7 @@ export default function AgentProfilePage(props: {
 
       <div className="px-4 sm:px-6 lg:px-8 pt-4 pb-2 max-w-6xl mx-auto">
         <button
-          onClick={() => router.push('/institution-dashboard/agents')}
+          onClick={() => router.push('/institution/agents')}
           className="flex items-center gap-2 text-muted-foreground text-sm hover:text-primary"
         >
           <ArrowLeft className="w-4 h-4" />

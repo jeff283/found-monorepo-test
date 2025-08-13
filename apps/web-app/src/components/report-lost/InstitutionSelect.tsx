@@ -16,6 +16,7 @@ interface InstitutionSelectProps {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   onSelect: (institutionId: string) => void;
+  onBack?: () => void; // ⬅️ added
 }
 
 export default function InstitutionSelect({
@@ -23,6 +24,7 @@ export default function InstitutionSelect({
   searchQuery,
   setSearchQuery,
   onSelect,
+  onBack, // ⬅️ added
 }: InstitutionSelectProps) {
   const filteredInstitutions = institutions.filter(
     (institution) =>
@@ -35,7 +37,13 @@ export default function InstitutionSelect({
       <div className="bg-white rounded-3xl shadow-sm w-full max-w-screen-sm sm:max-w-screen-md md:max-w-[900px] lg:max-w-[1100px] p-4 sm:p-6 md:p-10 lg:p-14 space-y-6">
         {/* Header */}
         <div className="flex items-center gap-2 sm:gap-4">
-          <Button variant="ghost" size="icon" className="h-8 w-8">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={onBack}            // ⬅️ added
+            aria-label="Go back"        // (nice for a11y)
+          >
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <span className="text-base sm:text-lg font-medium">Report lost</span>

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation" // ⬅️ added
 import laxLogo from "@/assets/images/logos/Institution Logos/Los Angeles International Airport (LAX).jpeg"
 import uclaLogo from "@/assets/images/logos/Institution Logos/University of California.png"
 import westfieldLogo from "@/assets/images/logos/Institution Logos/Westfield Century City Mall.png"
@@ -19,7 +20,6 @@ interface Institution {
   address: string;
   logo: string | StaticImageData;
 }
-
 
 interface FoundItem {
   itemName: string
@@ -132,7 +132,11 @@ const initialFoundItems: FoundItem[] = [
     matchPercentage: 62,
   },
 ];
+
 export default function ReportLost() {
+  const router = useRouter(); // ⬅️ added
+  const DASHBOARD_URL = "https://app.foundlyhq.com/institution/dashboard"; // ⬅️ added
+
   const [currentStep, setCurrentStep] = useState<"select-institution" | "report-details" | "found-matches" | "success">(
     "select-institution",
   );
@@ -154,6 +158,11 @@ export default function ReportLost() {
   };
 
   const handleBack = () => {
+    // ⬇️ NEW: if user is on the first step, redirect to institution dashboard
+    if (currentStep === "select-institution") {
+      router.push(DASHBOARD_URL);
+      return;
+    }
     if (currentStep === "found-matches") {
       setCurrentStep("report-details");
     } else if (currentStep === "report-details") {
@@ -209,6 +218,7 @@ export default function ReportLost() {
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           onSelect={handleInstitutionSelect}
+          onBack={handleBack} 
         />
       </ResponsiveWrapper>
     );
@@ -271,14 +281,15 @@ export default function ReportLost() {
       </ResponsiveWrapper>
     );
   }
-    return (
-      <ResponsiveWrapper>
-        <SuccessScreen
-          referenceId={referenceId}
-          onTrackReport={handleTrackReport}
-          onReportAnother={handleReportAnother}
-          onBackToWebsite={handleBackToWebsite}
-        />
-      </ResponsiveWrapper>
-    );
-  }
+
+  return (
+    <ResponsiveWrapper>
+      <SuccessScreen
+        referenceId={referenceId}
+        onTrackReport={handleTrackReport}
+        onReportAnother={handleReportAnother}
+        onBackToWebsite={handleBackToWebsite}
+      />
+    </ResponsiveWrapper>
+  );
+}

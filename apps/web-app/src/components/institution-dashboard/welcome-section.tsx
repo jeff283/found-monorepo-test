@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 interface WelcomeSectionProps {
@@ -8,6 +9,7 @@ interface WelcomeSectionProps {
 
 export function WelcomeSection({ userName, compact }: WelcomeSectionProps) {
   const [greeting, setGreeting] = useState(getGreeting());
+  const router = useRouter();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -42,6 +44,7 @@ export function WelcomeSection({ userName, compact }: WelcomeSectionProps) {
           className={`bg-cyan-500 ${
             compact ? "h-7 px-3 text-xs" : "h-8 px-4 text-sm"
           }`}
+          onClick={() => router.push("/report-lost")}
         >
           Report Lost
         </Button>
