@@ -1,10 +1,4 @@
-import {
-  integer,
-  pgTable,
-  timestamp,
-  varchar,
-  uuid,
-} from "drizzle-orm/pg-core";
+import { pgTable, timestamp, varchar, uuid } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
 export const tenantSchema = pgTable("tenant", {
