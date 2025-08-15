@@ -14,7 +14,12 @@
     "deploy:preview": "turbo run deploy:preview",
     "deploy:stage": "turbo run deploy:stage",
     "build:opennext": "turbo run build:opennext",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "db:push": "turbo -F web-app db:push",
+    "db:pull": "turbo -F web-app db:pull",
+    "db:studio": "turbo -F web-app db:studio",
+    "db:generate": "turbo -F web-app db:generate",
+    "db:migrate": "turbo -F web-app db:migrate"
   },
   "devDependencies": {
     "prettier": "^3.6.2",
