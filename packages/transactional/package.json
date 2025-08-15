@@ -4,8 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "email dev -p 3006",
-    "export": "email export",
-    "build": "email build"
+    "export": "email export"
   },
   "dependencies": {
     "@react-email/components": "0.5.0",
