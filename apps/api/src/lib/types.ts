@@ -21,6 +21,7 @@ import type {
 export interface ApiResponse<T = any> {
   success: boolean;
   data?: T;
+  message?: string;
   error?: string;
   exists?: boolean;
 }
@@ -131,3 +132,16 @@ export interface ApplicationsResponse {
     search?: string;
   };
 }
+
+export type InstitutionCompletionStatus = {
+  organizationCompleted: boolean;
+  verificationCompleted: boolean;
+  readyForSubmission: boolean;
+};
+
+export type InstitutionStatusData = {
+  status: "not_started" | "approved" | "created" | string;
+  lastUpdated: string | null;
+  canEdit: boolean;
+  completionStatus: InstitutionCompletionStatus;
+};

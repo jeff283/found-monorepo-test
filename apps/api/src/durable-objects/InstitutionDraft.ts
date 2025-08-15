@@ -1,11 +1,11 @@
 import { DurableObject } from "cloudflare:workers";
 
-import { Env } from "@/lib/bindings";
+import { Env } from "@/api/lib/bindings";
 import {
   InstitutionDraftData,
   OrganizationStepData,
   VerificationStepData,
-} from "@/lib/types";
+} from "@/api/lib/types";
 import {
   validateCreateRequest,
   validateUpdateRequest,
@@ -23,10 +23,10 @@ import {
   addClerkOrgDetails,
   canBeApproved,
   canBeRejected,
-} from "@/lib/institution-helpers";
-import { formatValidationErrors } from "@/lib/validation-utils";
-import { AdminRegistryClient } from "@/lib/admin-registry-client";
-import { canUserUpdateInstitution } from "@/lib/update-permissions";
+} from "@/api/lib/institution-helpers";
+import { formatValidationErrors } from "@/api/lib/validation-utils";
+import { AdminRegistryClient } from "@/api/lib/admin-registry-client";
+import { canUserUpdateInstitution } from "@/api/lib/update-permissions";
 
 export class InstitutionDraftDO extends DurableObject {
   storage: DurableObjectStorage;

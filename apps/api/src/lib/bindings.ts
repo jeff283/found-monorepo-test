@@ -1,5 +1,5 @@
-import { InstitutionDraftDO } from "@/durable-objects/InstitutionDraft";
-import { AdminRegistryDO } from "@/durable-objects/AdminRegistry";
+import { InstitutionDraftDO } from "@/api/durable-objects/InstitutionDraft";
+import { AdminRegistryDO } from "@/api/durable-objects/AdminRegistry";
 
 export interface Env {
   // Bindings for the environment variables

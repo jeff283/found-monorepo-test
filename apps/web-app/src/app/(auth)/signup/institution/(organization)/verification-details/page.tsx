@@ -36,6 +36,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { ApiResponse } from "@/api/lib/types";
 
 // Countries list for the combobox
 const countries = [
@@ -182,7 +183,7 @@ const VerificationDetailsContent = () => {
         // throw new Error(errorData.error || "Failed to save verification data");
       }
 
-      const result = await response.json();
+      const result: ApiResponse = await response.json();
 
       if (result.success) {
         toast.success("Verification information saved successfully!");

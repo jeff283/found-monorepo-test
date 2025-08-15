@@ -1,5 +1,5 @@
 import { DurableObject } from "cloudflare:workers";
-import { Env } from "@/lib/bindings";
+import { Env } from "@/api/lib/bindings";
 import type {
   ApplicationRecord,
   RegistryData,
@@ -7,7 +7,7 @@ import type {
   InstitutionReference,
   InstitutionStatus,
   InstitutionType,
-} from "@/lib/types";
+} from "@/api/lib/types";
 
 export class AdminRegistryDO extends DurableObject {
   storage: DurableObjectStorage;

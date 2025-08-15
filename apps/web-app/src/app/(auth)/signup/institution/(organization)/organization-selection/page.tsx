@@ -11,6 +11,7 @@ import AuthHeader from "@/components/authentication/AuthHeader";
 import AuthBackButton from "@/components/authentication/AuthBackButton";
 import FoundlyButton from "@/components/authentication/FoundlyButton";
 import { PhoneIcon, Building2 } from "lucide-react";
+import { ApiResponse } from "@/api/lib/types";
 
 // Types for organization data
 interface Organization {
@@ -35,6 +36,29 @@ const OrganizationSelectionContent = () => {
   const [hasExistingRequest, setHasExistingRequest] = useState(false);
   const [emailDomain, setEmailDomain] = useState("");
 
+  type CheckDomainSuccessResponse =
+    | {
+        emailDomain: string;
+        organizationExists: true;
+        organizationDetails: {
+          institutionName: string;
+          clerkOrgId: string;
+          clerkOrgSlug: string;
+          status: string;
+        };
+        canJoin: true;
+        fromCache: boolean;
+        cacheTimestamp: string;
+      }
+    | {
+        emailDomain: string;
+        organizationExists: false;
+        organizationDetails: null;
+        canJoin: false;
+        fromCache: false;
+      };
+  type CheckDomainResponse = ApiResponse<CheckDomainSuccessResponse>;
+
   const checkExistingOrganization = useCallback(async () => {
     try {
       setLoading(true);
@@ -43,10 +67,12 @@ const OrganizationSelectionContent = () => {
       const domainCheckResponse = await callAPI(
         "/api/user/institution/check-domain"
       );
-      if (domainCheckResponse.ok) {
-        const domainResult = await domainCheckResponse.json();
 
-        if (domainResult.success && domainResult.data.organizationExists) {
+      if (domainCheckResponse.ok) {
+        const domainResult: CheckDomainResponse =
+          await domainCheckResponse.json();
+
+        if (domainResult.success && domainResult?.data?.organizationExists) {
           setExistingOrganization(domainResult.data.organizationDetails);
 
           // For now, we'll assume they don't have an existing request

@@ -6,7 +6,7 @@ import {
   expectJsonResponse,
   cleanupTestServer,
   type TestServer,
-} from "@/tests/integration/setup";
+} from "@/api/tests/integration/setup";
 
 describe("Institution API Integration Tests", () => {
   let server: TestServer;

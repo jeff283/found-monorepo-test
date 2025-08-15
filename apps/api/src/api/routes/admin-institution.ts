@@ -1,14 +1,14 @@
 import { Hono } from "hono";
-import { Env } from "@/lib/bindings";
+import { Env } from "@/api/lib/bindings";
 import { z } from "zod";
-import type { ApplicationRecord } from "@/lib/types";
+import type { ApplicationRecord } from "@/api/lib/types";
 import {
   getUserInfo,
   getUserInstitutionDO,
   getAdminRegistryDO,
-} from "@/lib/auth-helpers";
-import { InstitutionDraftData } from "@/lib/schemas";
-import { sendApplicationApproveStatus } from "@/emails/SendApplicationAction";
+} from "@/api/lib/auth-helpers";
+import { InstitutionDraftData } from "@/api/lib/schemas";
+import { sendApplicationApproveStatus } from "@/api/emails/SendApplicationAction";
 import { Resend } from "resend";
 
 const adminInstitutionRoutes = new Hono<{ Bindings: Env }>();

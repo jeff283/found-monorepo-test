@@ -11,7 +11,7 @@
     // @ import alias
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/api/*": ["src/*"]
     }
   }
 }

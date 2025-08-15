@@ -1,5 +1,8 @@
-import { Env } from "@/lib/bindings";
-import type { InstitutionDraftData, InstitutionReference } from "@/lib/types";
+import { Env } from "@/api/lib/bindings";
+import type {
+  InstitutionDraftData,
+  InstitutionReference,
+} from "@/api/lib/types";
 
 // Helper functions to sync with Admin Registry using direct method calls
 export class AdminRegistryClient {

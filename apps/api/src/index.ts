@@ -4,12 +4,12 @@ import {
   loggerMiddleware,
   requireAuthMiddleware,
   requireAdminMiddleware,
-} from "@/api/middleware";
-import { Env } from "@/lib/bindings";
+} from "@/api/api/middleware";
+import { Env } from "@/api/lib/bindings";
 import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
-import { userInstitutionRoutes } from "@/api/routes/user-institution";
-import { adminInstitutionRoutes } from "@/api/routes/admin-institution";
-import { getAuthenticatedUserInfo } from "@/lib/auth-helpers";
+import { userInstitutionRoutes } from "@/api/api/routes/user-institution";
+import { adminInstitutionRoutes } from "@/api/api/routes/admin-institution";
+import { getAuthenticatedUserInfo } from "@/api/lib/auth-helpers";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -56,6 +56,6 @@ app.route("/api/admin/institution", adminInstitutionRoutes);
 
 export default app;
 
-export { InstitutionDraftDO } from "@/durable-objects/InstitutionDraft";
+export { InstitutionDraftDO } from "@/api/durable-objects/InstitutionDraft";
 
-export { AdminRegistryDO } from "@/durable-objects/AdminRegistry";
+export { AdminRegistryDO } from "@/api/durable-objects/AdminRegistry";

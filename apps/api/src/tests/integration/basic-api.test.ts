@@ -7,7 +7,7 @@ import {
   expectTextResponse,
   cleanupTestServer,
   type TestServer,
-} from "@/tests/integration/setup";
+} from "@/api/tests/integration/setup";
 
 describe("Basic API Integration Tests", () => {
   let server: TestServer;

@@ -1,4 +1,4 @@
-import { InstitutionStatus } from "@/lib/schemas";
+import { InstitutionStatus } from "@/api/lib/schemas";
 
 /**
  * Centralized business logic for determining if institution data can be updated

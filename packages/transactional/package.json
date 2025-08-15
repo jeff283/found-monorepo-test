@@ -1,0 +1,23 @@
+{
+  "name": "@repo/transactional",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "email dev -p 3006",
+    "export": "email export",
+    "build": "email build"
+  },
+  "dependencies": {
+    "@react-email/components": "0.5.0",
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
+  },
+  "devDependencies": {
+    "@react-email/preview-server": "4.2.8",
+    "@types/node": "24.3.0",
+    "@types/react": "19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "react-email": "4.2.8",
+    "typescript": "5.9.2"
+  }
+}

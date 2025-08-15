@@ -6,6 +6,7 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "check-types": "turbo run check-types",
+    "cf-typegen": "turbo run cf-typegen",
     "test": "turbo run test",
     "preview": "turbo run preview",
     "deploy": "turbo run deploy",

@@ -99,7 +99,7 @@ Default configuration:
 
 The old integration tests that directly imported the app have been replaced with true HTTP-based tests. Key changes:
 
-- ❌ `import app from "@/index"` → ✅ `import { getTestServer } from "../integration-setup"`
+- ❌ `import app from "@/api/index"` → ✅ `import { getTestServer } from "../integration-setup"`
 - ❌ `app.request(request)` → ✅ `makeRequest(url)`
 - ❌ Mock-based auth → ✅ Real auth headers (or test without auth)
 - ❌ Direct function calls → ✅ HTTP requests

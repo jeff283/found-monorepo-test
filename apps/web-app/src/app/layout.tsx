@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Host_Grotesk } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/sonner"; // ✅ Add this line
+import { QueryProvider } from "@/components/providers/query-provider";
 
 const hostGrotesk = Host_Grotesk({
   variable: "--font-host-grotesk",
@@ -18,8 +19,10 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body className={`${hostGrotesk.variable} antialiased`}>
-          <Toaster richColors position="top-center" />
-          {children}
+          <QueryProvider>
+            <Toaster richColors position="top-center" />
+            {children}
+          </QueryProvider>
         </body>
       </html>
     </ClerkProvider>

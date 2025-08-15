@@ -7,8 +7,15 @@ export interface FoundlyUserPublicMetadata {
   // Add other public metadata fields as needed
 }
 
+export interface FoundlyOrganizationMetadata {
+  emailDomain: string;
+  // Add other organization metadata fields as needed
+}
+
 declare global {
   interface CustomJwtSessionClaims {
     metadata: FoundlyUserPublicMetadata;
+    activeOrgMetadata: FoundlyOrganizationMetadata;
+    primaryEmail: string;
   }
 }

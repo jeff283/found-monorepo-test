@@ -14,13 +14,15 @@
     "deploy:preview": "wrangler deploy --minify --env preview --keep-vars",
     "deploy:stage": "wrangler deploy --minify --env staging --keep-vars",
     "deploy:prod": "wrangler deploy --minify --env production --keep-vars",
-    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
+    "check-types": "tsc -b --noEmit"
   },
   "dependencies": {
     "@clerk/backend": "^2.6.2",
     "@hono/clerk-auth": "^3.0.3",
     "@react-email/render": "^1.2.0",
     "@repo/shared-types": "workspace:*",
+    "@repo/transactional": "workspace:*",
     "hono": "^4.8.10",
     "resend": "^6.0.1",
     "zod": "^4.0.14"

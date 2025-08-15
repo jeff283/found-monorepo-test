@@ -35,5 +35,6 @@ lerna-debug.log*
 # misc
 .DS_Store
 
-# workers types
-worker-configuration.d.ts
+
+# tsbuildinfo
+tsconfig.tsbuildinfo

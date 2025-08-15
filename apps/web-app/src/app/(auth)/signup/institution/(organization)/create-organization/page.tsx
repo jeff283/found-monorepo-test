@@ -102,7 +102,15 @@ const OrganizationSetupContent = () => {
         // throw new Error(errorData.error || "Failed to save organization data");
       }
 
-      const result = await response.json();
+      // API response type for organization creation
+      type OrganizationApiResponse = {
+        success: boolean;
+        data?: unknown;
+        message?: string;
+        error?: string;
+        details?: unknown;
+      };
+      const result: OrganizationApiResponse = await response.json();
 
       if (result.success) {
         toast.success("Organization information saved successfully!");

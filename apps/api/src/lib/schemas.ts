@@ -115,7 +115,7 @@ export const institutionDraftDataSchema = z.object({
     .optional(),
 
   // Verification details (Step 2)
-  website: z.string().url().optional(),
+  website: z.url().optional(),
   description: z.string().optional(),
   streetAddress: z.string().optional(),
   city: z.string().optional(),
@@ -166,3 +166,6 @@ export type ClerkOrganizationDetailsRequest = z.infer<
 export type InstitutionDraftData = z.infer<typeof institutionDraftDataSchema>;
 export type InstitutionStatus = z.infer<typeof institutionStatusSchema>;
 export type InstitutionStep = z.infer<typeof institutionStepSchema>;
+export type ClerkOrganizationDetails = z.infer<
+  typeof clerkOrganizationDetailsSchema
+>;

@@ -1,8 +1,8 @@
 import { Context } from "hono";
 import { Resend } from "resend";
-import { InstitutionDraftData } from "@/lib/schemas";
-import { Approvedhtml } from "@/emails/templates/ApplicationApproved";
-import { Env } from "@/lib/bindings";
+import { InstitutionDraftData } from "@/api/lib/schemas";
+import { Approvedhtml } from "@/api/emails/templates/ApplicationApproved";
+import { Env } from "@/api/lib/bindings";
 
 export async function sendApplicationApproveStatus(
   c: Context<{ Bindings: Env }>,

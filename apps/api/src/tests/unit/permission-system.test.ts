@@ -3,7 +3,7 @@ import {
   canUserUpdateInstitution,
   canAdminChangeStatus,
   getStatusDescription,
-} from "@/lib/update-permissions";
+} from "@/api/lib/update-permissions";
 
 describe("Permission System Tests", () => {
   it("should export permission functions", async () => {

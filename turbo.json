@@ -23,6 +23,13 @@
     "test:run": {
       "cache": false
     },
+    "cf-typegen": {
+      "dependsOn": ["^cf-typegen"],
+      "cache": false,
+      "inputs": ["$TURBO_DEFAULT$", ".env*", "wrangler.jsonc", "package.json"],
+
+      "outputs": []
+    },
     "preview": {
       "dependsOn": ["^build"],
       "cache": false

@@ -1,6 +1,6 @@
 import { Context } from "hono";
 import { getAuth } from "@hono/clerk-auth";
-import { Env } from "@/lib/bindings";
+import { Env } from "@/api/lib/bindings";
 
 /**
  * Helper to require admin authentication

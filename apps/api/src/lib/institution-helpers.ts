@@ -6,7 +6,7 @@ import {
   verificationStepSchema,
   createInstitutionDraftSchema,
   updateInstitutionDraftSchema,
-} from "@/lib/schemas";
+} from "@/api/lib/schemas";
 
 // Email domain extraction utility
 export function extractEmailDomain(email: string): string {

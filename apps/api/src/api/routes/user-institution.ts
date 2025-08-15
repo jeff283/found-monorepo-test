@@ -1,16 +1,17 @@
 import { Hono } from "hono";
-import { Env } from "@/lib/bindings";
+import { Env } from "@/api/lib/bindings";
 import {
   organizationStepSchema,
   verificationStepSchema,
   clerkOrganizationDetailsSchema,
-} from "@/lib/schemas";
+} from "@/api/lib/schemas";
 import { z } from "zod";
 import {
   getAuthenticatedAuth,
   getUserInfo,
   getUserInstitutionDO,
-} from "@/lib/auth-helpers";
+} from "@/api/lib/auth-helpers";
+import { getInstitutionStatus } from "@/api/lib/utils/insitution-status-helper";
 
 const userInstitutionRoutes = new Hono<{ Bindings: Env }>();
 
@@ -395,38 +396,9 @@ userInstitutionRoutes.get("/status", async (c) => {
     const institutionDO = getUserInstitutionDO(c, auth.userId);
     const draftData = await institutionDO.getDraftData();
 
-    if (!draftData) {
-      return c.json({
-        success: true,
-        data: {
-          status: "not_started",
-          lastUpdated: null,
-          canEdit: true,
-          completionStatus: {
-            organizationCompleted: false,
-            verificationCompleted: false,
-            readyForSubmission: false,
-          },
-        },
-      });
-    }
-
-    return c.json({
-      success: true,
-      data: {
-        status: draftData.status,
-        lastUpdated: draftData.updatedAt,
-        canEdit:
-          draftData.status !== "approved" && draftData.status !== "created",
-        completionStatus: {
-          organizationCompleted: !!draftData.institutionName,
-          verificationCompleted: !!draftData.website,
-          readyForSubmission: !!(
-            draftData.institutionName && draftData.website
-          ),
-        },
-      },
-    });
+    // Compute status data from draft data
+    const statusData = getInstitutionStatus(draftData);
+    return c.json({ success: true, data: statusData });
   } catch (error) {
     console.error("Error fetching status:", error);
     return c.json(

@@ -2,8 +2,8 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
 import { Context, Next } from "hono";
-import { Env } from "@/lib/bindings";
-import { getUserInfo } from "@/lib/auth-helpers";
+import { Env } from "@/api/lib/bindings";
+import { getUserInfo } from "@/api/lib/auth-helpers";
 import { z } from "zod";
 
 // Lightweight Zod schema for admin email validation
