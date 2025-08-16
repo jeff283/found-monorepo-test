@@ -3,6 +3,8 @@
   "name": "foundly-api",
   "main": "src/index.ts",
   "compatibility_date": "2025-07-28",
+  "compatibility_flags": ["nodejs_compat"],
+
   "durable_objects": {
     "bindings": [
       {

@@ -9,7 +9,7 @@
     "test:unit:watch": "vitest --project unit --watch",
     "test:int": "vitest --project integration --run",
     "test:int:watch": "vitest --project integration --watch",
-    "dev": "wrangler dev",
+    "dev": "wrangler dev --port=3001",
     "deploy": "wrangler deploy --minify --keep-vars",
     "deploy:preview": "wrangler deploy --minify --env preview --keep-vars",
     "deploy:stage": "wrangler deploy --minify --env staging --keep-vars",
@@ -23,7 +23,10 @@
     "@react-email/render": "^1.2.0",
     "@repo/shared-types": "workspace:*",
     "@repo/transactional": "workspace:*",
+    "dotenv": "^17.2.1",
+    "drizzle-orm": "^0.44.4",
     "hono": "^4.8.10",
+    "postgres": "^3.4.7",
     "resend": "^6.0.1",
     "zod": "^4.0.14"
   },
@@ -31,6 +34,7 @@
     "@cloudflare/vitest-pool-workers": "^0.8.59",
     "@cloudflare/workers-types": "^4.20250801.0",
     "@types/node": "^24.1.0",
+    "drizzle-kit": "^0.31.4",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4",
     "wrangler": "^4.27.0"

@@ -12,6 +12,9 @@ import {
   getUserInstitutionDO,
 } from "@/api/lib/auth-helpers";
 import { getInstitutionStatus } from "@/api/lib/utils/insitution-status-helper";
+import { getDomainCacheKey } from "@/api/lib/utils/domain-cache-key";
+import { db } from "@/api/db/drizzle";
+import { Tenant, tenantSchema } from "@/web-app/db/drizzle/schema/tenant";
 
 const userInstitutionRoutes = new Hono<{ Bindings: Env }>();
 
@@ -428,6 +431,47 @@ userInstitutionRoutes.post("/clerk-details", async (c) => {
       validatedData.clerkOrgSlug
     );
 
+    if (result) {
+      console.log(
+        "ROUTE(/clerk-details): Clerk organization details added successfully",
+        result
+      );
+    } else {
+      console.log(
+        "ROUTE(/clerk-details): Failed to add Clerk organization details",
+        validatedData
+      );
+    }
+
+    const draftData = await institutionDO.getDraftData();
+
+    const emailDomain = draftData?.emailDomain || "";
+
+    const cacheKey = getDomainCacheKey(emailDomain);
+
+    // Cache the result
+    await c.env.DOMAIN_CACHE.put(cacheKey, emailDomain);
+    console.log("ROUTE(/clerk-details): Cached email domain", emailDomain);
+
+    // Add Org to db
+    const dbResult = await db.insert(tenantSchema).values({
+      name: draftData?.institutionName || "",
+      clerkId: validatedData.clerkOrgId,
+      emailDomain,
+    });
+
+    if (dbResult) {
+      console.log(
+        "ROUTE(/clerk-details): Clerk organization details added to DB",
+        dbResult
+      );
+    } else {
+      console.log(
+        "ROUTE(/clerk-details): Failed to add Clerk organization details to DB",
+        validatedData
+      );
+    }
+
     return c.json({
       success: true,
       data: result,
@@ -491,7 +535,7 @@ userInstitutionRoutes.get("/check-domain", async (c) => {
     }
 
     // 🎯 CACHE READ: Check KV cache first for instant lookup
-    const cacheKey = `domain:${emailDomain}`;
+    const cacheKey = getDomainCacheKey(emailDomain);
 
     try {
       const cachedData = (await c.env.DOMAIN_CACHE.get(

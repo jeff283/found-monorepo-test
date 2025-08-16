@@ -4,6 +4,8 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
+    "dev:apps": "turbo run dev --filter=./apps/*",
+    "dev:packages": "turbo run dev --filter=./packages/*",
     "lint": "turbo run lint",
     "check-types": "turbo run check-types",
     "cf-typegen": "turbo run cf-typegen",

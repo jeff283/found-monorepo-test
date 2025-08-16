@@ -66,8 +66,8 @@ jobs:
       - name: Run build (packages only)
         run: pnpm run build --filter="./packages/*"
 
-      - name: Run cf-typegen
-        run: pnpm run cf-typegen
+      # - name: Run cf-typegen
+      #   run: pnpm run cf-typegen
 
       - name: Run lint
         run: pnpm run lint
