@@ -449,8 +449,16 @@ userInstitutionRoutes.post("/clerk-details", async (c) => {
 
     const cacheKey = getDomainCacheKey(emailDomain);
 
+    const cacheData = JSON.stringify({
+      institutionName: draftData?.institutionName || "",
+      clerkOrgId: validatedData.clerkOrgId,
+      clerkOrgSlug: validatedData.clerkOrgSlug,
+      status: "pending",
+      cachedAt: new Date().toISOString(),
+    });
+
     // Cache the result
-    await c.env.DOMAIN_CACHE.put(cacheKey, emailDomain);
+    await c.env.DOMAIN_CACHE.put(cacheKey, cacheData);
     console.log("ROUTE(/clerk-details): Cached email domain", emailDomain);
 
     // Add Org to db
