@@ -4,22 +4,40 @@ import { useState } from 'react';
 import { MoreVertical } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Pagination } from '@/components/shared/Pagination';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/components/ui/dropdown-menu';
 
 type Item = {
-  id: string;
   locationName: string;
-  address: string;
-  state: string;
-  city: string;
-  institutionLinked: string;
+  type: string;
+  floor?: string;
+  room?: string;
+  staffLinked?: string;
   status: string;
 };
 
 type LocationsTableProps = {
   data: Item[];
+  onEdit?: (item: Item) => void;
+  onDelete?: (item: Item) => void;
+  onStatusChange?: (item: Item, newStatus: string) => void;
 };
 
-export function LocationsTable({ data }: LocationsTableProps) {
+const statusOptions = [
+  'Active',
+  'Inactive',
+];
+
+export function LocationsTable({
+  data,
+  onEdit,
+  onDelete,
+  onStatusChange,
+}: LocationsTableProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
@@ -35,12 +53,11 @@ export function LocationsTable({ data }: LocationsTableProps) {
       <table className="min-w-[900px] w-full text-sm text-left border-separate border-spacing-y-0.5">
         <thead className="bg-white">
           <tr className="text-muted-foreground border-b">
-            <th className="px-4 py-3 font-medium text-gray-500">Item id</th>
             <th className="px-4 py-3 font-medium text-gray-500">Location Name</th>
-            <th className="px-4 py-3 font-medium text-gray-500">Address</th>
-            <th className="px-4 py-3 font-medium text-gray-500">State</th>
-            <th className="px-4 py-3 font-medium text-gray-500">City</th>
-            <th className="px-4 py-3 font-medium text-gray-500">Institution Linked</th>
+            <th className="px-4 py-3 font-medium text-gray-500">Type</th>
+            <th className="px-4 py-3 font-medium text-gray-500">Floor</th>
+            <th className="px-4 py-3 font-medium text-gray-500">Room</th>
+            <th className="px-4 py-3 font-medium text-gray-500">Staff Linked</th>
             <th className="px-4 py-3 font-medium text-gray-500">Status</th>
             <th className="px-4 py-3 font-medium text-gray-500 text-right">Action</th>
           </tr>
@@ -53,12 +70,11 @@ export function LocationsTable({ data }: LocationsTableProps) {
                 index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
               } border-t`}
             >
-              <td className="px-4 py-3 whitespace-nowrap">{item.id}</td>
               <td className="px-4 py-3 whitespace-nowrap">{item.locationName}</td>
-              <td className="px-4 py-3 whitespace-nowrap">{item.address}</td>
-              <td className="px-4 py-3 whitespace-nowrap">{item.state}</td>
-              <td className="px-4 py-3 whitespace-nowrap">{item.city}</td>
-              <td className="px-4 py-3 whitespace-nowrap">{item.institutionLinked}</td>
+              <td className="px-4 py-3 whitespace-nowrap">{item.type}</td>
+              <td className="px-4 py-3 whitespace-nowrap">{item.floor}</td>
+              <td className="px-4 py-3 whitespace-nowrap">{item.room}</td>
+              <td className="px-4 py-3 whitespace-nowrap">{item.staffLinked}</td>
               <td className="px-4 py-3 whitespace-nowrap">
                 <Badge
                   variant="secondary"
@@ -68,7 +84,47 @@ export function LocationsTable({ data }: LocationsTableProps) {
                 </Badge>
               </td>
               <td className="px-4 py-3 text-right whitespace-nowrap">
-                <MoreVertical className="w-5 h-5 mx-auto text-gray-600 cursor-pointer" />
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <MoreVertical className="w-5 h-5 mx-auto text-gray-600 cursor-pointer" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => onEdit && onEdit(item)}>
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => onDelete && onDelete(item)}
+                      className="text-red-600"
+                    >
+                      Delete
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-xs text-muted-foreground mb-1">
+                          Change Status
+                        </span>
+                        <div className="flex flex-wrap gap-1">
+                          {statusOptions.map((status) => (
+                            <button
+                              key={status}
+                              type="button"
+                              className={`px-2 py-1 rounded text-xs ${
+                                item.status === status
+                                  ? 'bg-primary text-white'
+                                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                              }`}
+                              onClick={() =>
+                                onStatusChange && onStatusChange(item, status)
+                              }
+                            >
+                              {status}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </td>
             </tr>
           ))}
