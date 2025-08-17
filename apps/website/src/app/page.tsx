@@ -35,8 +35,8 @@ export default function Home() {
           </h2>
           <HeroVideoDialog
             animationStyle="from-center"
-            videoSrc="https://www.youtube.com/embed/NZp5j5hvn9I"
-            thumbnailSrc="https://img.youtube.com/vi/NZp5j5hvn9I/maxresdefault.jpg"
+            videoSrc="https://www.youtube.com/embed/g21-bkNSKBQ"
+            thumbnailSrc="https://img.youtube.com/vi/g21-bkNSKBQ/maxresdefault.jpg"
             thumbnailAlt="Foundly Demo Video"
             className="mx-auto w-full aspect-[2.1]"
           />
