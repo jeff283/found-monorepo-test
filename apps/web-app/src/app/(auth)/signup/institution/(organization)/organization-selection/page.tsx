@@ -24,7 +24,7 @@ interface Organization {
 const OrganizationSelectionContent = () => {
   const router = useRouter();
   const { user } = useUser();
-  const { callAPI } = useApiCall();
+  const { callAPI, post } = useApiCall();
 
   // Get user data from Clerk session
   const email = user?.emailAddresses[0]?.emailAddress || "";
@@ -102,19 +102,15 @@ const OrganizationSelectionContent = () => {
     setRequestLoading(true);
 
     try {
-      // For now, show a message that this feature is coming soon
-      toast.info(
-        "Join request functionality is coming soon! Please contact the organization administrator directly."
-      );
-
-      // TODO: Implement join request API endpoint
-      // const response = await callAPI("/api/user/institution/join-request", {
-      //   method: "POST",
-      //   body: JSON.stringify({
-      //     clerkOrgId: existingOrganization.clerkOrgId,
-      //     clerkOrgSlug: existingOrganization.clerkOrgSlug,
-      //   })
-      // });
+      const clerkOrgID = existingOrganization.clerkOrgId;
+      const response = await post("/api/user/institution/join-request", {
+        organizationId: clerkOrgID,
+      });
+      if (response.ok) {
+        toast.success("Join request sent successfully!");
+      } else {
+        toast.error("Failed to send join request.");
+      }
     } catch (error) {
       console.error("Error sending join request:", error);
       toast.error("Failed to send join request. Please try again.");
@@ -188,7 +184,7 @@ const OrganizationSelectionContent = () => {
                 as="button"
               />
 
-              <div className="relative">
+              {/* <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-300" />
                 </div>
@@ -203,7 +199,7 @@ const OrganizationSelectionContent = () => {
                 variant="outline"
                 className="w-full"
                 as="button"
-              />
+              /> */}
             </div>
           )}
         </div>

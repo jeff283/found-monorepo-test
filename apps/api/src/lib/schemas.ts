@@ -149,7 +149,17 @@ export const institutionDraftDataSchema = z.object({
   syncedAt: z.string().optional(),
 });
 
-export const KVDomainCache = z.object({});
+export const KVDomainCache = z.object({
+  institutionName: z.string().min(1, "Institution name is required"),
+  clerkOrgId: z.string().min(1, "Clerk organization ID is required"),
+  clerkOrgSlug: z.string().min(1, "Clerk organization slug is required"),
+  status: institutionStatusSchema,
+  cachedAt: z.string().min(1, "Cached at is required"),
+});
+
+export const OrganizationJoinRequest = z.object({
+  organizationId: z.string().min(1, "Organization ID is required"),
+});
 
 // Type inference from schemas
 export type OrganizationStepData = z.infer<typeof organizationStepSchema>;

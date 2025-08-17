@@ -4,6 +4,7 @@ import {
   organizationStepSchema,
   verificationStepSchema,
   clerkOrganizationDetailsSchema,
+  OrganizationJoinRequest,
 } from "@/api/lib/schemas";
 import { z } from "zod";
 import {
@@ -14,7 +15,7 @@ import {
 import { getInstitutionStatus } from "@/api/lib/utils/insitution-status-helper";
 import { getDomainCacheKey } from "@/api/lib/utils/domain-cache-key";
 import { db } from "@/api/db/drizzle";
-import { Tenant, tenantSchema } from "@/web-app/db/drizzle/schema/tenant";
+import { tenantSchema } from "@/web-app/db/drizzle/schema/tenant";
 
 const userInstitutionRoutes = new Hono<{ Bindings: Env }>();
 
@@ -718,6 +719,80 @@ userInstitutionRoutes.get("/clerk-details", async (c) => {
       {
         success: false,
         error: "Failed to fetch Clerk organization details",
+      },
+      500
+    );
+  }
+});
+
+// POST /api/user/institution/join-request - Send a join request to an organization
+userInstitutionRoutes.post("/join-request", async (c) => {
+  try {
+    const clerk = c.get("clerk");
+    const { userId, userEmail } = await getUserInfo(c);
+    // Parse the request body
+    const body = await c.req.json();
+    const parsed = OrganizationJoinRequest.parse(body);
+
+    const organization = await clerk.organizations.getOrganization({
+      organizationId: parsed.organizationId,
+    });
+
+    const orgEmailDomain = organization.publicMetadata?.emailDomain;
+
+    // check if the user's email domain matches the org
+    if (orgEmailDomain && userEmail.endsWith(`@${orgEmailDomain}`)) {
+      // Create the organization invitation
+      const createdOrgInvitation =
+        await clerk.organizations.createOrganizationInvitation({
+          inviterUserId: userId,
+          emailAddress: userEmail,
+          organizationId: organization.id,
+          role: "org:member",
+          redirectUrl: "https://app.foundlyhq.com/institution/dashboard",
+        });
+
+      return c.json({
+        success: true,
+        message: "Organization invitation created successfully",
+      });
+    } else {
+      return c.json(
+        {
+          success: false,
+          error: "Email domain does not match organization",
+        },
+        400
+      );
+    }
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return c.json(
+        {
+          success: false,
+          error: "Validation failed",
+          message: error.issues,
+        },
+        400
+      );
+    }
+
+    // Handle permission errors from DO
+    if (error instanceof Error && error.message.includes("not permitted")) {
+      return c.json(
+        {
+          success: false,
+          error: error.message,
+        },
+        403
+      );
+    }
+
+    console.error("Error sending an organization join request:", error);
+    return c.json(
+      {
+        success: false,
+        error: "Failed to send organization join request",
       },
       500
     );
