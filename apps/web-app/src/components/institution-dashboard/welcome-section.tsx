@@ -44,7 +44,7 @@ export function WelcomeSection({ userName, compact }: WelcomeSectionProps) {
           className={`bg-cyan-500 ${
             compact ? "h-7 px-3 text-xs" : "h-8 px-4 text-sm"
           }`}
-          onClick={() => router.push("/report-lost")}
+          onClick={() => router.push("/students/report-lost")}
         >
           Report Lost
         </Button>
