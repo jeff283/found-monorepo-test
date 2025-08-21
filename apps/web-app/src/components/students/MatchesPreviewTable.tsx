@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ChevronRight, Search as SearchIcon } from "lucide-react";
 import Image from "next/image";
+
 type Match = {
   id: string;
   item: string;
@@ -186,14 +187,6 @@ export function MatchesPreviewTable({
                       Review &amp; claim
                     </Link>
                   </td>
-                  <td className="hidden md:table-cell">{m.location}</td>
-                  <td><ConfidencePill value={m.confidence} /></td>
-                  <td className="hidden sm:table-cell">{m.updatedAt}</td>
-                  <td className="text-right">
-                    <Link href={`/students/matches/${m.id}`} className="button-text-small text-primary">
-                      Review &amp; claim
-                    </Link>
-                  </td>
                 </tr>
               ))
             )}
@@ -203,7 +196,6 @@ export function MatchesPreviewTable({
     </div>
   );
 }
-
 
 function ConfidencePill({ value }: { value: number }) {
   let tone = "bg-gray-200 text-gray-700";      // Default: gray

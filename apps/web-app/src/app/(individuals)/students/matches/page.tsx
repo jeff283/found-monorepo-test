@@ -147,7 +147,7 @@ export default function MatchesPage() {
         {groupByReport ? (
           <GroupedByReportView loading={loading} data={slice} />
         ) : (
-          <FlatTableView loading={loading} data={slice} />
+          <FlatCardView loading={loading} data={slice} />
         )}
 
         {/* Pagination */}
@@ -179,76 +179,6 @@ export default function MatchesPage() {
 }
 
 /* ===== Views ===== */
-function FlatTableView({ loading, data }: { loading: boolean; data: MatchRow[] }) {
-  return (
-    <div className="rounded-2xl border bg-card overflow-hidden">
-      <table className="w-full text-sm border-separate border-spacing-0">
-        <thead className="bg-muted/40">
-          <tr className="[&_th]:px-5 [&_th]:py-3 text-left">
-            <th>Item</th>
-            <th className="hidden lg:table-cell">Matched to</th>
-            <th>Found at</th>
-            <th>Confidence</th>
-            <th className="hidden sm:table-cell">Updated</th>
-            <th className="hidden md:table-cell">Claim</th>
-            <th />
-          </tr>
-        </thead>
-        <tbody className="[&_tr]:border-b [&_td]:px-5 [&_td]:py-3">
-          {loading ? (
-            Array.from({ length: 6 }).map((_, i) => (
-              <tr key={`sk-${i}`} className="animate-pulse">
-                <td><div className="h-4 w-40 bg-muted rounded" /></td>
-                <td className="hidden lg:table-cell"><div className="h-4 w-40 bg-muted rounded" /></td>
-                <td><div className="h-4 w-32 bg-muted rounded" /></td>
-                <td><div className="h-6 w-20 bg-muted rounded-full" /></td>
-                <td className="hidden sm:table-cell"><div className="h-4 w-20 bg-muted rounded" /></td>
-                <td className="hidden md:table-cell"><div className="h-5 w-16 bg-muted rounded-full" /></td>
-                <td><div className="h-4 w-16 bg-muted rounded ml-auto" /></td>
-              </tr>
-            ))
-          ) : data.length === 0 ? (
-            <tr>
-              <td colSpan={7} className="py-10 text-center text-muted-foreground">
-                No matches for your current filters.
-              </td>
-            </tr>
-          ) : (
-            data.map((m) => (
-              <tr key={m.id} className="hover:bg-muted/30 transition-colors">
-                <td className="font-medium">
-                  <div className="flex items-center gap-3">
-                    {m.imageUrl && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={m.imageUrl} alt="" className="h-8 w-8 rounded-md object-cover" />
-                    )}
-                    {m.item}
-                  </div>
-                </td>
-                <td className="hidden lg:table-cell">
-                  <span className="caption-small text-muted-foreground">Ref</span>{" "}
-                  <code className="bg-muted px-1.5 py-0.5 rounded">{m.reportRef}</code>{" "}
-                  <span className="caption-small text-muted-foreground">•</span>{" "}
-                  <span className="caption-small">{m.reportTitle}</span>
-                </td>
-                <td>{m.location}</td>
-                <td><ConfidencePill value={m.confidence} /></td>
-                <td className="hidden sm:table-cell">{m.updatedAt}</td>
-                <td className="hidden md:table-cell"><ClaimStatusPill status={m.claimStatus} /></td>
-                <td className="text-right">
-                  <Link href={`/students/matches/${m.id}`} className="button-text-small text-primary">
-                    Review &amp; claim
-                  </Link>
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
 function GroupedByReportView({ loading, data }: { loading: boolean; data: MatchRow[] }) {
   if (loading) {
     return (
@@ -274,7 +204,6 @@ function GroupedByReportView({ loading, data }: { loading: boolean; data: MatchR
     (acc[row.reportRef] ||= []).push(row);
     return acc;
   }, {});
-
   return (
     <div className="space-y-6">
       {Object.entries(groups).map(([ref, rows]) => (
@@ -286,7 +215,61 @@ function GroupedByReportView({ loading, data }: { loading: boolean; data: MatchR
             </div>
             <Link href={`/students/my-reports/${ref}`} className="button-text-small text-primary">Track report →</Link>
           </div>
-          <FlatTableView loading={false} data={rows} />
+          <FlatCardView loading={false} data={rows} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function FlatCardView({ loading, data }: { loading: boolean; data: MatchRow[] }) {
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="rounded-xl border bg-muted/40 p-6 animate-pulse h-40" />
+        ))}
+      </div>
+    );
+  }
+  if (data.length === 0) {
+    return (
+      <div className="rounded-xl border bg-card p-6 text-center text-muted-foreground">
+        No matches for your current filters.
+      </div>
+    );
+  }
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      {data.map((m) => (
+        <div key={m.id} className="rounded-xl border bg-card p-5 flex flex-col gap-3">
+          <div className="flex items-center gap-3">
+            {m.imageUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={m.imageUrl} alt="" className="h-12 w-12 rounded-md object-cover" />
+            )}
+            <div>
+              <div className="font-semibold">{m.item}</div>
+              <div className="caption-small text-muted-foreground">{m.location}</div>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <ConfidencePill value={m.confidence} />
+            <ClaimStatusPill status={m.claimStatus} />
+            <span className="caption-small text-muted-foreground">{m.updatedAt}</span>
+          </div>
+          <div className="flex flex-col gap-1 mt-auto">
+            <span className="caption-small text-muted-foreground">
+              Matched to <code className="bg-muted px-1.5 py-0.5 rounded">{m.reportRef}</code>
+            </span>
+            <span className="caption-small">{m.reportTitle}</span>
+          </div>
+          <Link
+            href={`/students/matches/${m.id}`}
+            className="button-text-small text-primary mt-2 self-end"
+          >
+            Review &amp; claim
+          </Link>
         </div>
       ))}
     </div>
