@@ -1,1 +1,1 @@
-export { updateUserJobTitle } from "@/server/actions/user-metadata";
+export { updateUserJobTitle } from "@/server/actions/auth/user-metadata";

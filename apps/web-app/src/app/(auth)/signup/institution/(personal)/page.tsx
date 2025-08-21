@@ -28,7 +28,7 @@ import {
   showSuccessToast,
 } from "@/utils/auth-error-handler";
 import ContactSupport from "@/components/authentication/ContactSupport";
-import { updateUserJobTitle } from "@/server/actions/user-metadata";
+import { updateUserJobTitle } from "@/server/actions/auth/user-metadata";
 
 /**
  * Comprehensive list of public email domains to prevent institution registration

@@ -16,7 +16,7 @@ import { useState, useEffect } from "react";
 import slugify from "slugify";
 import { CheckCircle, Clock, Building2, Zap, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { updateOrgEmailDomain } from "@/server/actions/org-metadata";
+import { updateOrgEmailDomain } from "@/server/actions/auth/org-metadata";
 
 type LoadingStage =
   | "initializing"
