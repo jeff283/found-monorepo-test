@@ -53,8 +53,15 @@ const seedLocations: Location[] = [
 /* =========================
    AddAgentPopover
    ========================= */
-export function AddAgentPopover() {
-  const [open, setOpen] = useState(false);
+export function AddAgentPopover({
+  open,
+  onOpenChange,
+}: {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = typeof open === 'boolean' && typeof onOpenChange === 'function';
 
   // form state
   const [email, setEmail] = useState("");
@@ -74,7 +81,11 @@ export function AddAgentPopover() {
 
     // TODO: POST to your API
     console.log("Submitting Add Staff", payload);
-    setOpen(false);
+    if (isControlled) {
+      onOpenChange?.(false);
+    } else {
+      setInternalOpen(false);
+    }
 
     // Sonner notification
     toast.success("Agent added successfully!", {
@@ -89,13 +100,15 @@ export function AddAgentPopover() {
   }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover
+      open={isControlled ? open : internalOpen}
+      onOpenChange={isControlled ? onOpenChange! : setInternalOpen}
+    >
       <PopoverTrigger asChild>
         <Button className="bg-primary text-white rounded-lg flex items-center gap-2 px-4 py-2 text-sm">
           <Plus size={16} /> Add Staff
         </Button>
       </PopoverTrigger>
-
       <PopoverContent
         align="end"
         className="rounded-xl w-[340px] sm:w-[420px] p-4 shadow-lg space-y-4 border bg-white"
@@ -103,7 +116,15 @@ export function AddAgentPopover() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="text-base font-semibold">Add Staff</div>
-          <button onClick={() => setOpen(false)}>
+          <button
+            onClick={() => {
+              if (isControlled) {
+                onOpenChange?.(false);
+              } else {
+                setInternalOpen(false);
+              }
+            }}
+          >
             <X className="h-5 w-5 text-muted-foreground hover:text-foreground" />
           </button>
         </div>
@@ -164,7 +185,17 @@ export function AddAgentPopover() {
 
         {/* Footer */}
         <div className="flex justify-between pt-2 gap-2">
-          <Button variant="ghost" className="w-1/2" onClick={() => setOpen(false)}>
+          <Button
+            variant="ghost"
+            className="w-1/2"
+            onClick={() => {
+              if (isControlled) {
+                onOpenChange?.(false);
+              } else {
+                setInternalOpen(false);
+              }
+            }}
+          >
             Cancel
           </Button>
           <Button
@@ -427,3 +458,7 @@ function LocationCombobox({
     </Popover>
   );
 }
+// function setOpen(_arg0: boolean) {
+//   throw new Error("Function not implemented.");
+// }
+

@@ -1,22 +1,22 @@
 import React from 'react';
 import { Plus, Search, UserPlus, ClipboardCheck, LayoutGrid } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../ui/popover';
+import { useRouter } from "next/navigation";
 
 export function GridPopover() {
+  const router = useRouter();
+
   const handleLogFoundItem = () => {
-    // TODO: Implement log found item action
-    alert('Log Found Item action triggered');
+    // Navigate to found items page and open modal via query param
+    router.push("/institution/found-items?reportFound=true");
   };
   const handleSearchLostReport = () => {
-    // TODO: Implement search lost report action
     alert('Search Lost Report action triggered');
   };
   const handleAddNewAgent = () => {
-    // TODO: Implement add new agent action
-    alert('Add New Agent action triggered');
+    router.push("/institution/agents?addAgent=true");
   };
   const handleViewTodaysClaims = () => {
-    // TODO: Implement view today’s claims action
     alert('View Today’s Claims action triggered');
   };
 

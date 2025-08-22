@@ -135,25 +135,25 @@ export function DashboardHeader({ user, compact }: DashboardHeaderProps) {
       </div>
 
       {/* Right: Popovers & Profile */}
-      <div className="flex items-center gap-3">
-        <div className="rounded-lg">
+      <div className="flex items-center gap-2">
+        <div className="flex p-0.5 items-center gap-1 rounded border border-[#F4F4F4] bg-white">
           <SearchPopover />
         </div>
-        <div className="rounded-lg">
+        <div className="flex p-0.5 items-center gap-1 rounded border border-[#F4F4F4] bg-white">
           <GridPopover />
         </div>
-        <div className="rounded-lg">
+        <div className="flex p-0.5 items-center gap-1 rounded border border-[#F4F4F4] bg-white">
           <NotificationsPopover />
         </div>
-        <div className="relative rounded-lg">
+        <div className="relative rounded">
           <ProfileDropdown user={user}>
             <button className="flex items-center gap-2 focus:outline-none">
               <Image
                 src={user.avatar || "/default-avatar.png"}
                 alt={user.name}
-                width={40}
-                height={40}
-                className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover"
+                width={32}
+                height={32}
+                className="w-8 h-8 rounded-full object-cover"
               />
               <div className="hidden sm:flex flex-col text-right leading-tight">
                 <span className="button-text-small text-black truncate">

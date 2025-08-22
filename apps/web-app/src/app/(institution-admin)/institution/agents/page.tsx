@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import AgentCard from '@/components/institution-dashboard/agents/AgentCard';
 import { Pagination } from '@/components/shared/Pagination';
@@ -13,6 +14,7 @@ import {
 import { Filter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { AddAgentPopover } from '@/components/institution-dashboard/agents/AddAgentDialog';
+import { useRouter } from "next/navigation";
 
 const agents = [
   {
@@ -73,10 +75,21 @@ const agents = [
   }
 ];
 
-export default function AgentsPage() {
+function AgentsContent() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [search, setSearch] = useState("");
+  const searchParams = useSearchParams();
+  const addAgentOpen = searchParams.get('addAgent') === 'true';
+  const [addAgentPopoverOpen, setAddAgentPopoverOpen] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (addAgentOpen) {
+      setAddAgentPopoverOpen(true);
+      router.replace("/institution/agents", { scroll: false });
+    }
+  }, [addAgentOpen, router]);
 
   // Filter agents by name, email, or location
   const filteredAgents = agents.filter(
@@ -111,7 +124,7 @@ export default function AgentsPage() {
                 <button className="button-text-small px-4 py-2 border border-input rounded-lg text-muted-foreground flex items-center gap-2">
                   <Filter size={16} /> Filter
                 </button>
-                <AddAgentPopover />
+                <AddAgentPopover open={addAgentPopoverOpen} onOpenChange={setAddAgentPopoverOpen} />
               </div>
             </div>
           </div>
@@ -142,5 +155,14 @@ export default function AgentsPage() {
         </div>
       </div>
     </>
+  );
+}
+
+// Default export for the page
+export default function AgentsPage() {
+  return (
+    <Suspense>
+      <AgentsContent />
+    </Suspense>
   );
 }

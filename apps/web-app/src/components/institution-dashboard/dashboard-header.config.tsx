@@ -8,7 +8,7 @@ import {
 } from "@/components/institution-dashboard/navbar-popovers";
 import { MessagesSheet } from "@/components/navbar-popovers/messages-sheet";
 import { Home, ClipboardList, Users, MapPin, BarChart3, Shield } from "lucide-react";
-import Image from "next/image";
+// import Image from "next/image";
 import type { NavItem, User } from "@/components/common/dashboard-header";
 
 // Test User
@@ -58,29 +58,22 @@ export const defaultNavItems: NavItem[] = [
  */
 export function ProfileDropdownContent(user: User) {
   return (
-    <div className="flex items-center gap-3">
-      <SearchPopover />
-      <GridPopover />
-      <MessagesSheet />
-      <NotificationsPopover />
-      <ProfileDropdown user={user}>
-        <button className="flex items-center gap-2 focus:outline-none">
-          <Image
-            src={user.avatar || "/avatars/default-avatar.png"}
-            alt={user.name}
-            width={40}
-            height={40}
-            className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover"
-          />
-          <div className="hidden sm:flex flex-col text-right leading-tight">
-            <span className="button-text-small text-black truncate">{user.name}</span>
-            <span className="caption-small text-muted-foreground flex items-center gap-1">
-              {user.role}
-              <span className="text-primary text-xs">✔</span>
-            </span>
-          </div>
-        </button>
-      </ProfileDropdown>
+    <div className="flex items-center gap-2">
+      <div className="flex p-0.5 items-center gap-1 rounded-md border border-[#F4F4F4] bg-white">
+        <SearchPopover />
+      </div>
+      <div className="flex p-0.5 items-center gap-1 rounded-md border border-[#F4F4F4] bg-white">
+        <GridPopover />
+      </div>
+      <div className="flex p-0.5 items-center gap-1 rounded-md border border-[#F4F4F4] bg-white">
+        <MessagesSheet />
+      </div>
+      <div className="flex p-0.5 items-center gap-1 rounded-md border border-[#F4F4F4] bg-white">
+        <NotificationsPopover />
+      </div>
+      <div className="relative rounded-md">
+        <ProfileDropdown user={user} />
+      </div>
     </div>
   );
 }

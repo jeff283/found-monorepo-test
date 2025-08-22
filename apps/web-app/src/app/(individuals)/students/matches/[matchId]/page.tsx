@@ -22,6 +22,19 @@ type MatchDetail = {
   claimStatus: ClaimStatus;
 };
 
+/* ---------- Mock Data ---------- */
+// Move MOCK outside the component so it's stable
+const MOCK: MatchDetail[] = [
+  { id: "m1", item: "Black AirPods Pro", location: "Info Desk – Library", foundDate: "2h ago", description: "Black AirPods Pro in case, found at Info Desk.", images: [], confidence: 96, reportRef: "USA-USA-30224", reportTitle: "Black AirPods Pro", claimStatus: "Unclaimed" },
+  { id: "m2", item: "Black Earbuds", location: "Student Center", foundDate: "Yesterday", description: "Black Earbuds found at Student Center.", images: [], confidence: 57, reportRef: "USA-USA-30224", reportTitle: "Black AirPods Pro", claimStatus: "Pending" },
+  { id: "m3", item: "Blue Hydro Flask", location: "Gym Reception", foundDate: "2d ago", description: "Blue Hydro Flask found at Gym Reception.", images: [], confidence: 66, reportRef: "USA-USA-16497", reportTitle: "Blue Hydro Flask", claimStatus: "Denied" },
+  { id: "m4", item: "Lenovo ThinkPad", location: "IT Helpdesk", foundDate: "3d ago", description: "Lenovo ThinkPad found at IT Helpdesk.", images: [], confidence: 41, reportRef: "USA-USA-98765", reportTitle: "Red Backpack", claimStatus: "Unclaimed" },
+  { id: "m5", item: "Casio FX-991EX", location: "Room B204", foundDate: "Yesterday", description: "Casio FX-991EX calculator found in Room B204.", images: [], confidence: 93, reportRef: "USA-USA-16497", reportTitle: "Blue Hydro Flask", claimStatus: "Approved" },
+  { id: "m6", item: "Lenovo ThinkPad", location: "IT Helpdesk", foundDate: "3d ago", description: "Lenovo ThinkPad found at IT Helpdesk.", images: [], confidence: 81, reportRef: "USA-USA-98765", reportTitle: "Red Backpack", claimStatus: "Unclaimed" },
+  { id: "m7", item: "Apple Watch", location: "Gym Reception", foundDate: "1h ago", description: "Apple Watch found at Gym Reception.", images: [], confidence: 85, reportRef: "USA-USA-30224", reportTitle: "Apple Watch", claimStatus: "Approved" },
+  // Add more as needed
+];
+
 /* ---------- Page ---------- */
 export default function MatchDetailPage() {
   const { matchId } = useParams<{ matchId: string }>();
@@ -32,18 +45,6 @@ export default function MatchDetailPage() {
   const [showClaim, setShowClaim] = useState(false);
   const [claimSubmitted, setClaimSubmitted] = useState(false);
   const [rejecting, setRejecting] = useState(false);
-
-  // Add the mock array here
-  const MOCK: MatchDetail[] = [
-    { id: "m1", item: "Black AirPods Pro", location: "Info Desk – Library", foundDate: "2h ago", description: "Black AirPods Pro in case, found at Info Desk.", images: [], confidence: 96, reportRef: "USA-USA-30224", reportTitle: "Black AirPods Pro", claimStatus: "Unclaimed" },
-    { id: "m2", item: "Black Earbuds", location: "Student Center", foundDate: "Yesterday", description: "Black Earbuds found at Student Center.", images: [], confidence: 57, reportRef: "USA-USA-30224", reportTitle: "Black AirPods Pro", claimStatus: "Pending" },
-    { id: "m3", item: "Blue Hydro Flask", location: "Gym Reception", foundDate: "2d ago", description: "Blue Hydro Flask found at Gym Reception.", images: [], confidence: 66, reportRef: "USA-USA-16497", reportTitle: "Blue Hydro Flask", claimStatus: "Denied" },
-    { id: "m4", item: "Lenovo ThinkPad", location: "IT Helpdesk", foundDate: "3d ago", description: "Lenovo ThinkPad found at IT Helpdesk.", images: [], confidence: 41, reportRef: "USA-USA-98765", reportTitle: "Red Backpack", claimStatus: "Unclaimed" },
-    { id: "m5", item: "Casio FX-991EX", location: "Room B204", foundDate: "Yesterday", description: "Casio FX-991EX calculator found in Room B204.", images: [], confidence: 93, reportRef: "USA-USA-16497", reportTitle: "Blue Hydro Flask", claimStatus: "Approved" },
-    { id: "m6", item: "Lenovo ThinkPad", location: "IT Helpdesk", foundDate: "3d ago", description: "Lenovo ThinkPad found at IT Helpdesk.", images: [], confidence: 81, reportRef: "USA-USA-98765", reportTitle: "Red Backpack", claimStatus: "Unclaimed" },
-    { id: "m7", item: "Apple Watch", location: "Gym Reception", foundDate: "1h ago", description: "Apple Watch found at Gym Reception.", images: [], confidence: 85, reportRef: "USA-USA-30224", reportTitle: "Apple Watch", claimStatus: "Approved" },
-    // Add more as needed
-  ];
 
   useEffect(() => {
     let alive = true;
@@ -60,7 +61,7 @@ export default function MatchDetailPage() {
     setLoading(false);
 
     return () => { alive = false; };
-  }, [matchId]);
+  }, [matchId]); // <-- Only depend on matchId
 
   const status = useMemo<ClaimStatus>(() => {
     if (claimSubmitted) return "Pending";
