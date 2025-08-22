@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation" // ⬅️ added
+import { useRouter } from "next/navigation" 
 import laxLogo from "@/assets/images/logos/Institution Logos/Los Angeles International Airport (LAX).jpeg"
 import uclaLogo from "@/assets/images/logos/Institution Logos/University of California.png"
 import westfieldLogo from "@/assets/images/logos/Institution Logos/Westfield Century City Mall.png"
@@ -134,8 +134,8 @@ const initialFoundItems: FoundItem[] = [
 ];
 
 export default function ReportLost() {
-  const router = useRouter(); // ⬅️ added
-  const DASHBOARD_URL = "https://app.foundlyhq.com/institution/dashboard"; // ⬅️ added
+  const router = useRouter(); 
+  // const DASHBOARD_URL = "https://app.foundlyhq.com/institution/dashboard"; //  added
 
   const [currentStep, setCurrentStep] = useState<"select-institution" | "report-details" | "found-matches" | "success">(
     "select-institution",
@@ -158,9 +158,9 @@ export default function ReportLost() {
   };
 
   const handleBack = () => {
-    // ⬇️ NEW: if user is on the first step, redirect to institution dashboard
+    // NEW: if user is on the first step, redirect to institution dashboard
     if (currentStep === "select-institution") {
-      router.push(DASHBOARD_URL);
+      router.back();
       return;
     }
     if (currentStep === "found-matches") {

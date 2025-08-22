@@ -31,6 +31,8 @@ const mock: Report[] = [
   { id: "2", referenceId: "USA-USA-16497", title: "Blue Hydro Flask",  status: "Open",    createdAt: "2025-08-15T09:30:00Z", lastSeenPlace: "Student Center", lastSeenTime: "Yesterday, 17:10" },
   { id: "3", referenceId: "USA-USA-12345", title: "Lost Wallet",       status: "Closed",  createdAt: "2025-08-10T14:20:00Z", updatedAt: "2025-08-12T10:00:00Z" },
   { id: "4", referenceId: "USA-USA-98765", title: "Red Backpack",      status: "Open",    createdAt: "2025-08-05T11:15:00Z" },
+  { id: "5", referenceId: "USA-USA-54321", title: "iPad Mini",         status: "Matched", createdAt: "2025-08-01T08:45:00Z", updatedAt: "2025-08-03T09:30:00Z", lastSeenPlace: "Cafeteria" },
+  
 ];
 
 /* ==== Page ==== */

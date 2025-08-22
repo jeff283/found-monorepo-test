@@ -16,7 +16,7 @@ interface InstitutionSelectProps {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   onSelect: (institutionId: string) => void;
-  onBack?: () => void; // ⬅️ added
+  onBack?: () => void; 
 }
 
 export default function InstitutionSelect({
@@ -24,7 +24,7 @@ export default function InstitutionSelect({
   searchQuery,
   setSearchQuery,
   onSelect,
-  onBack, // ⬅️ added
+  onBack, 
 }: InstitutionSelectProps) {
   const filteredInstitutions = institutions.filter(
     (institution) =>
@@ -41,8 +41,8 @@ export default function InstitutionSelect({
             variant="ghost"
             size="icon"
             className="h-8 w-8"
-            onClick={onBack}            // ⬅️ added
-            aria-label="Go back"        // (nice for a11y)
+            onClick={onBack}            
+            aria-label="Go back"        
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>

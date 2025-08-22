@@ -5,7 +5,7 @@ import Link from "next/link";
 import { DashboardHeader } from "@/components/common/dashboard-header";
 import { studentNavItems, defaultStudentUser } from "@/components/students/dashboard-header.config";
 import { Search as SearchIcon, ChevronLeft, ChevronRight } from "lucide-react";
-
+import Image from "next/image";
 /* ===== Types ===== */
 type ClaimStatus = "Unclaimed" | "Pending" | "Approved" | "Denied";
 type MatchRow = {
@@ -22,11 +22,17 @@ type MatchRow = {
 
 /* ===== Mock data (swap with fetch) ===== */
 const MOCK: MatchRow[] = [
-  { id: "m1", item: "Black AirPods Pro", location: "Info Desk – Library", confidence: 82, updatedAt: "2h ago", reportRef: "USA-USA-30224", reportTitle: "Black AirPods Pro", claimStatus: "Unclaimed" },
+  { id: "m1", item: "Black AirPods Pro", location: "Info Desk – Library", confidence: 96, updatedAt: "2h ago", reportRef: "USA-USA-30224", reportTitle: "Black AirPods Pro", claimStatus: "Unclaimed" },
   { id: "m2", item: "Black Earbuds",     location: "Student Center",      confidence: 57, updatedAt: "Yesterday", reportRef: "USA-USA-30224", reportTitle: "Black AirPods Pro", claimStatus: "Pending" },
   { id: "m3", item: "Blue Hydro Flask",  location: "Gym Reception",       confidence: 66, updatedAt: "2d ago", reportRef: "USA-USA-16497", reportTitle: "Blue Hydro Flask", claimStatus: "Denied" },
   { id: "m4", item: "Lenovo ThinkPad",   location: "IT Helpdesk",         confidence: 41, updatedAt: "3d ago", reportRef: "USA-USA-98765", reportTitle: "Red Backpack", claimStatus: "Unclaimed" },
-  { id: "m5", item: "Casio FX-991EX",    location: "Room B204",           confidence: 73, updatedAt: "Yesterday", reportRef: "USA-USA-16497", reportTitle: "Blue Hydro Flask", claimStatus: "Approved" },
+  { id: "m5", item: "Casio FX-991EX",    location: "Room B204",           confidence: 93, updatedAt: "Yesterday", reportRef: "USA-USA-16497", reportTitle: "Blue Hydro Flask", claimStatus: "Approved" },
+  { id: "m6", item: "Lenovo ThinkPad",   location: "IT Helpdesk",         confidence: 81, updatedAt: "3d ago", reportRef: "USA-USA-98765", reportTitle: "Red Backpack", claimStatus: "Unclaimed" },
+  { id: "m7", item: "Apple Watch",       location: "Gym Reception",      confidence: 85, updatedAt: "1h ago", reportRef: "USA-USA-30224", reportTitle: "Apple Watch", claimStatus: "Approved" },
+  // { id: "m8", item: "Samsung Galaxy S21", location: "Info Desk – Library", confidence: 90, updatedAt: "30m ago", reportRef: "USA-USA-30224", reportTitle: "Samsung Galaxy S21", claimStatus: "Unclaimed" },
+  // { id: "m9", item: "Google Pixel 6",    location: "IT Helpdesk",       confidence: 75, updatedAt: "2h ago", reportRef: "USA-USA-30224", reportTitle: "Google Pixel 6", claimStatus: "Pending" },
+  // { id: "m10", item: "Sony WH-1000XM4",  location: "Library",           confidence: 88, updatedAt: "1h ago", reportRef: "USA-USA-30224", reportTitle: "Sony WH-1000XM4", claimStatus: "Approved" },
+  // { id: "m11", item: "Dell XPS 13",      location: "Cafeteria",         confidence: 60, updatedAt: "Yesterday", reportRef: "USA-USA-98765", reportTitle: "Red Backpack", claimStatus: "Denied" }
 ];
 
 /* ===== Page ===== */
@@ -87,12 +93,12 @@ export default function MatchesPage() {
 
       <div className="mx-auto w-full max-w-[1200px] px-4 md:px-0 space-y-4">
         <div className="flex items-start justify-between gap-3">
-          <h1 className="title-2">All Matches</h1>
+          <h1 className="text-2xl font-bold">All Matches</h1>
           <ConfidenceLegend />
         </div>
 
         {/* Toolbar */}
-        <div className="rounded-2xl border bg-card p-4 md:p-5 sticky top-2 z-[1]">
+        <div className="rounded-2xl border bg-card p-4 md:p-5">
           <div className="flex flex-wrap items-center gap-3">
             <div className="relative flex-1 min-w-[220px]">
               <SearchIcon className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -242,31 +248,53 @@ function FlatCardView({ loading, data }: { loading: boolean; data: MatchRow[] })
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
       {data.map((m) => (
-        <div key={m.id} className="rounded-xl border bg-card p-5 flex flex-col gap-3">
-          <div className="flex items-center gap-3">
+        <div key={m.id} className="relative rounded-xl border bg-card p-5 flex flex-col gap-4">
+          {/* Claim Status Pill - top right */}
+          <div className="absolute top-4 right-4 z-[10]">
+            <ClaimStatusPill status={m.claimStatus} />
+          </div>
+          {/* Card Info */}
+          <div className="flex items-center gap-4 mt-2">
             {m.imageUrl && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={m.imageUrl} alt="" className="h-12 w-12 rounded-md object-cover" />
+              <Image
+                  src={m.imageUrl}
+                  alt={m.item}
+                  width={48}   // h-12 = 48px
+                  height={48}  // w-12 = 48px
+                  className="h-12 w-12 rounded-md object-cover"
+              />
             )}
-            <div>
-              <div className="font-semibold">{m.item}</div>
-              <div className="caption-small text-muted-foreground">{m.location}</div>
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-2 font-semibold">
+                <span className="caption-small text-muted-foreground">Item:</span>
+                <span>{m.item}</span>
+              </div>
+              <div className="flex items-center gap-2 caption-small text-muted-foreground">
+                <span>Location:</span>
+                <span className="text-foreground">{m.location}</span>
+              </div>
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-3 mt-2">
             <ConfidencePill value={m.confidence} />
-            <ClaimStatusPill status={m.claimStatus} />
-            <span className="caption-small text-muted-foreground">{m.updatedAt}</span>
-          </div>
-          <div className="flex flex-col gap-1 mt-auto">
-            <span className="caption-small text-muted-foreground">
-              Matched to <code className="bg-muted px-1.5 py-0.5 rounded">{m.reportRef}</code>
+            <span className="flex items-center gap-2 caption-small text-muted-foreground">
+              <span>Updated:</span>
+              <span className="text-foreground">{m.updatedAt}</span>
             </span>
-            <span className="caption-small">{m.reportTitle}</span>
+          </div>
+          <div className="flex flex-col gap-2 mt-2">
+            <span className="flex items-center gap-2 caption-small text-muted-foreground">
+              <span>Matched to:</span>
+              <code className="bg-muted px-1.5 py-0.5 rounded">{m.reportRef}</code>
+            </span>
+            <span className="flex items-center gap-2 caption-small">
+              <span className="text-muted-foreground">Report Title:</span>
+              <span className="text-foreground">{m.reportTitle}</span>
+            </span>
           </div>
           <Link
             href={`/students/matches/${m.id}`}
-            className="button-text-small text-primary mt-2 self-end"
+            className="button-text-small text-primary mt-3 self-end"
           >
             Review &amp; claim
           </Link>
@@ -314,10 +342,28 @@ function ConfidenceLegend() {
 }
 
 function ConfidencePill({ value }: { value: number }) {
-  let tone = "bg-muted text-muted-foreground";
-  if (value >= 80) tone = "bg-teal-100 text-secondary";
-  else if (value >= 50) tone = "bg-accent text-secondary";
-  return <span className={`caption-small px-2 py-1 rounded-full inline-block ${tone}`}>{value}% match</span>;
+  let label = "";
+  let tone = "";
+
+  if (value >= 90) {
+    label = "Very Strong Match";
+    tone = "bg-green-100 text-green-600";
+  } else if (value >= 70) {
+    label = "Potential Match";
+    tone = "bg-orange-100 text-orange-600";
+  } else {
+    label = "Weak Match";
+    tone = "bg-gray-100 text-gray-600";
+  }
+
+  return (
+    <span
+      className={`caption-small px-3 py-1 rounded-full font-semibold inline-block ${tone}`}
+      title={`This match is based on an AI confidence score of ${value}%.`}
+    >
+      {label} ({value}%)
+    </span>
+  );
 }
 
 function ClaimStatusPill({ status }: { status: ClaimStatus }) {
@@ -328,3 +374,39 @@ function ClaimStatusPill({ status }: { status: ClaimStatus }) {
                             "bg-accent text-secondary";
   return <span className={`caption-small px-2 py-1 rounded-full inline-block ${tone}`}>{status}</span>;
 }
+
+// --- Example: TanStack Query for fetching matches ---
+// import { useQuery } from "@tanstack/react-query";
+// import { getStudentMatches } from "@/lib/db/queries";
+
+// const { data: rows = [], isLoading: loading } = useQuery({
+//   queryKey: ["student-matches"],
+//   queryFn: async () => await getStudentMatches(/* userId or params */),
+// });
+
+// --- Example: Drizzle ORM query (server-side) ---
+// import { db } from "@/lib/db/connection";
+// import { matches } from "@/lib/db/schema";
+// import { eq } from "drizzle-orm";
+
+// export async function getStudentMatches(userId: string) {
+//   return await db
+//     .select()
+//     .from(matches)
+//     .where(eq(matches.userId, userId))
+//     .orderBy(matches.confidence.desc());
+// }
+
+// --- Example: Supabase query (client-side) ---
+// import { createClient } from "@supabase/supabase-js";
+// const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
+
+// async function fetchMatches(userId: string) {
+//   const { data, error } = await supabase
+//     .from("matches")
+//     .select("*")
+//     .eq("user_id", userId)
+//     .order("confidence", { ascending: false });
+//   if (error) throw error;
+//   return data;
+// }
