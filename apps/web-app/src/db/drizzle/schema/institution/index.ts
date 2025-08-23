@@ -16,3 +16,7 @@ export {
 // --- AGENTS ---
 export { agent } from "./agent";
 export { agentRelations } from "./agent";
+
+// --- JOIN REQUESTS ---
+export { joinRequest, joinRequestStatusEnum } from "./joinRequest";
+export { joinRequestRelations } from "./joinRequest";

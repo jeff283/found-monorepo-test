@@ -16,6 +16,11 @@ import { getInstitutionStatus } from "@/api/lib/utils/insitution-status-helper";
 import { getDomainCacheKey } from "@/api/lib/utils/domain-cache-key";
 import { db } from "@/api/db/drizzle";
 import { tenant } from "@/web-app/db/drizzle/schema/tenant";
+import {
+  joinRequest,
+  NewJoinRequest,
+} from "@/web-app/db/drizzle/schema/institution/joinRequest";
+import { eq } from "drizzle-orm";
 
 const userInstitutionRoutes = new Hono<{ Bindings: Env }>();
 
@@ -730,6 +735,7 @@ userInstitutionRoutes.post("/join-request", async (c) => {
   try {
     const clerk = c.get("clerk");
     const { userId, userEmail } = await getUserInfo(c);
+
     // Parse the request body
     const body = await c.req.json();
     const parsed = OrganizationJoinRequest.parse(body);
@@ -741,22 +747,7 @@ userInstitutionRoutes.post("/join-request", async (c) => {
     const orgEmailDomain = organization.publicMetadata?.emailDomain;
 
     // check if the user's email domain matches the org
-    if (orgEmailDomain && userEmail.endsWith(`@${orgEmailDomain}`)) {
-      // Create the organization invitation
-      const createdOrgInvitation =
-        await clerk.organizations.createOrganizationInvitation({
-          inviterUserId: userId,
-          emailAddress: userEmail,
-          organizationId: organization.id,
-          role: "org:member",
-          redirectUrl: "https://app.foundlyhq.com/institution/dashboard",
-        });
-
-      return c.json({
-        success: true,
-        message: "Organization invitation created successfully",
-      });
-    } else {
+    if (!orgEmailDomain || !userEmail.endsWith(`@${orgEmailDomain}`)) {
       return c.json(
         {
           success: false,
@@ -765,6 +756,34 @@ userInstitutionRoutes.post("/join-request", async (c) => {
         400
       );
     }
+
+    // Find the tenant in your DB that matches the org
+    const orgTenant = await db.query.tenant.findFirst({
+      where: eq(tenant.clerkId, parsed.organizationId),
+    });
+
+    if (!orgTenant) {
+      return c.json(
+        { success: false, error: "Tenant not found for this organization" },
+        404
+      );
+    }
+
+    // Build a new join request
+    const newJoinRequest: NewJoinRequest = {
+      userClerkId: userId,
+      tenantClerkId: orgTenant.clerkId,
+      email: userEmail,
+      status: "pending",
+    };
+
+    // Insert into DB
+    await db.insert(joinRequest).values(newJoinRequest);
+
+    return c.json({
+      success: true,
+      message: "Join request submitted successfully",
+    });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return c.json(
@@ -777,22 +796,22 @@ userInstitutionRoutes.post("/join-request", async (c) => {
       );
     }
 
-    // Handle permission errors from DO
-    if (error instanceof Error && error.message.includes("not permitted")) {
+    if (error instanceof Error && error.message.includes("duplicate key")) {
       return c.json(
         {
           success: false,
-          error: error.message,
+          error:
+            "You already have a pending join request for this organization",
         },
-        403
+        409
       );
     }
 
-    console.error("Error sending an organization join request:", error);
+    console.error("Error creating join request:", error);
     return c.json(
       {
         success: false,
-        error: "Failed to send organization join request",
+        error: "Failed to create join request",
       },
       500
     );
