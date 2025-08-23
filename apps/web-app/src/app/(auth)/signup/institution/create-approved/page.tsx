@@ -234,7 +234,9 @@ const CreateApprovedOrg = () => {
 
       if (!res.ok || !json.success) {
         throw new Error(
-          json.error || "Failed to add Clerk organization details"
+          Array.isArray(json.error)
+            ? json.error.join(", ")
+            : json.error || "Failed to add Clerk organization details"
         );
       }
       return json.data;

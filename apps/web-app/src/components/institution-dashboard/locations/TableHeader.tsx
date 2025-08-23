@@ -1,6 +1,9 @@
 "use client";
 
-import { FilterDropdown, type FilterValues } from "@/components/found-items/FilterDropdown";
+import {
+  FilterDropdown,
+  type FilterValues,
+} from "@/components/found-items/FilterDropdown";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, ChevronDown, Plus } from "lucide-react";
@@ -13,17 +16,24 @@ import {
   SheetDescription,
   SheetClose,
 } from "@/components/ui/sheet";
-import { AddLocationForm, type NewLocation } from "./AddLocationForm";
+import { AddLocationForm } from "./AddLocationForm";
+import type { Location } from "@/db/drizzle/schema/institution/locations";
 
 type TableHeaderProps = {
   onFilterApply: (filters: FilterValues) => void;
-  onCreated: (row: NewLocation) => void;
+  onCreated: (row: Location | undefined) => void;
   locationCount: number;
   search: string;
   setSearch: (val: string) => void;
 };
 
-export function TableHeader({ onFilterApply, onCreated, locationCount, search, setSearch }: TableHeaderProps) {
+export function TableHeader({
+  onFilterApply,
+  onCreated,
+  locationCount,
+  search,
+  setSearch,
+}: TableHeaderProps) {
   return (
     <div className="w-full max-w-[1286px] mx-auto mb-4 px-4">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -75,7 +85,8 @@ export function TableHeader({ onFilterApply, onCreated, locationCount, search, s
               <SheetHeader className="px-4 pt-4">
                 <SheetTitle>Add New Location</SheetTitle>
                 <SheetDescription>
-                  Create a building, desk, office, kiosk or zone inside your institution.
+                  Create a building, desk, office, kiosk or zone inside your
+                  institution.
                 </SheetDescription>
               </SheetHeader>
 
@@ -85,7 +96,9 @@ export function TableHeader({ onFilterApply, onCreated, locationCount, search, s
                   onCreated={(row) => {
                     onCreated(row);
                     // programmatically close the sheet after success
-                    const btn = document.querySelector<HTMLButtonElement>('[data-close-sheet="1"]');
+                    const btn = document.querySelector<HTMLButtonElement>(
+                      '[data-close-sheet="1"]'
+                    );
                     btn?.click();
                   }}
                 />

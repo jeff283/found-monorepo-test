@@ -1,7 +1,6 @@
 "use client";
 
-import * as React from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { z } from "zod";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,23 +31,28 @@ import {
   CommandEmpty,
 } from "@/components/ui/command";
 
-/* ------------ Row type returned to the table ------------- */
-export type NewLocation = {
-  id: string;
-  locationName: string;
-  type: string;
-  floor?: string;
-  room?: string;
-  staffLinked?: string;
-  status: "Active" | "Inactive";
-};
+import { useQuery, useMutation } from "@tanstack/react-query";
+import {
+  getBuildings,
+  GetBuildingsResponse,
+  createBuilding,
+  createBuildingInput,
+  getLocationTypes,
+  getLocationTypesResponse,
+  createLocation,
+  CreateLocationInput,
+} from "@/server/actions/institution/query-locations";
+import type { Location } from "@/db/drizzle/schema/institution/locations";
+
+/* ------------ Row type returned to the table ------------- 
 
 /* ------------ Form schema ------------- */
 const schema = z.object({
   name: z.string().min(2, "Name is required"),
-  type: z.enum(["building", "desk", "office", "kiosk", "zone"], {
-    error: "Type is required",
-  }),
+  // type: z.enum(["building", "desk", "office", "kiosk", "zone"], {
+  //   error: "Type is required",
+  // }),
+  type: z.string().min(2, "Type is required"),
   status: z.enum(["active", "inactive"], {
     error: "Status is required",
   }),
@@ -59,19 +63,50 @@ const schema = z.object({
 });
 type FormValues = z.infer<typeof schema>;
 
-/* ------------ Mock buildings for the parent picker ------------- */
-const mockBuildings = [
-  { id: "bldg_wilson", name: "Wilson Commons" },
-  { id: "bldg_carlson", name: "Carlson Library" },
-  { id: "bldg_admin", name: "Administration Block" },
-];
-
 export function AddLocationForm({
   onCreated,
 }: {
-  onCreated: (row: NewLocation) => void;
+  onCreated: (row: Location | undefined) => void;
 }) {
-  const [buildings, setBuildings] = useState(mockBuildings);
+  // Fetch buildings for the parent picker
+  const { data: buildingsData, refetch: refetchBuildings } =
+    useQuery<GetBuildingsResponse>({
+      queryKey: ["buildings"],
+      queryFn: () => getBuildings(),
+    });
+
+  // Create building
+  const createBuildingMutation = useMutation({
+    mutationFn: (data: createBuildingInput) => createBuilding(data),
+    onSuccess: (response) => {
+      toast.success(`Building ${response.data?.name} created successfully`);
+      refetchBuildings();
+    },
+    onError: (error) => {
+      toast.error(`Error creating building: ${error.message}`);
+    },
+  });
+
+  // Get location types
+  const {
+    data: locationTypesData,
+    isLoading: isLocationTypesLoading,
+    isError: isLocationTypesError,
+  } = useQuery<getLocationTypesResponse>({
+    queryKey: ["locationTypes"],
+    queryFn: () => getLocationTypes(),
+  });
+
+  // Create Location
+  const createLocationMutation = useMutation({
+    mutationFn: (data: CreateLocationInput) => createLocation(data),
+    onSuccess: (response) => {
+      toast.success(`Location ${response.data?.name} created successfully`);
+    },
+    onError: (error) => {
+      toast.error(`Error creating location: ${error.message}`);
+    },
+  });
 
   // toggles for optional fields
   const [showFloor, setShowFloor] = useState(false);
@@ -79,36 +114,40 @@ export function AddLocationForm({
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { type: "desk", status: "active" },
+    defaultValues: { status: "active" },
   });
-
-  const type = form.watch("type");
-
-  useEffect(() => {
-    if (type === "building") form.setValue("parentId", undefined);
-  }, [type, form]);
 
   const onSubmit: SubmitHandler<FormValues> = async (values) => {
     if (!showFloor) form.setValue("floor", undefined);
     if (!showRoom) form.setValue("room", undefined);
 
-    if ((values.type === "desk" || values.type === "office") && !values.parentId) {
-      form.setError("parentId", { type: "validate", message: "Parent building is required" });
+    if (!values.parentId) {
+      form.setError("parentId", {
+        type: "validate",
+        message: "Parent building is required",
+      });
       return;
     }
-
-    const id = `#${Math.floor(200 + Math.random() * 900)}`;
-    const newRow: NewLocation = {
-      id,
-      locationName: values.name,
-      type: values.type,
+    const createdLocation = await createLocationMutation.mutateAsync({
+      name: values.name,
+      buildingId: values.parentId,
+      status: values.status,
+      typeId: values.type,
       floor: values.floor,
       room: values.room,
-      staffLinked: values.staffLinked ?? "1 linked",
-      status: values.status === "active" ? "Active" : "Inactive",
-    };
+    });
 
-    onCreated(newRow);
+    // const id = `#${Math.floor(200 + Math.random() * 900)}`;
+    // const newRow: NewLocation = {
+    //   id,
+    //   locationName: values.name,
+    //   type: values.type,
+    //   floor: values.floor,
+    //   room: values.room,
+    //   staffLinked: values.staffLinked ?? "1 linked",
+    //   status: values.status === "active" ? "Active" : "Inactive",
+    // };
+    onCreated(createdLocation?.data);
 
     toast.success("Location created", {
       description:
@@ -123,18 +162,25 @@ export function AddLocationForm({
   };
 
   return (
-    <form className="grid grid-cols-1 gap-4" onSubmit={form.handleSubmit(onSubmit)}>
+    <form
+      className="grid grid-cols-1 gap-4"
+      onSubmit={form.handleSubmit(onSubmit)}
+    >
       {/* Name */}
       <div>
-        <Label htmlFor="name" className="mb-1 block">Name</Label>
+        <Label htmlFor="name" className="mb-1 block">
+          Name
+        </Label>
         <Input
           id="name"
           className="h-10 w-full min-w-[220px] sm:min-w-[320px] max-w-lg"
-          placeholder={type === "building" ? "e.g. Wilson Commons" : "e.g. Info Desk"}
+          placeholder={"e.g. Info Desk"}
           {...form.register("name")}
         />
         {form.formState.errors.name && (
-          <p className="text-xs text-red-500 mt-1">{form.formState.errors.name.message}</p>
+          <p className="text-xs text-red-500 mt-1">
+            {form.formState.errors.name.message}
+          </p>
         )}
       </div>
 
@@ -145,16 +191,35 @@ export function AddLocationForm({
           <Select
             value={form.watch("type")}
             onValueChange={(v: FormValues["type"]) => form.setValue("type", v)}
+            disabled={isLocationTypesLoading || isLocationTypesError}
           >
             <SelectTrigger className="h-10">
-              <SelectValue placeholder="Select type" />
+              <SelectValue
+                placeholder={
+                  isLocationTypesLoading
+                    ? "Loading types..."
+                    : isLocationTypesError
+                      ? "Failed to load"
+                      : "Select type"
+                }
+              />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="building">Building</SelectItem>
-              <SelectItem value="desk">Desk</SelectItem>
-              <SelectItem value="office">Office</SelectItem>
-              <SelectItem value="kiosk">Kiosk</SelectItem>
-              <SelectItem value="zone">Zone</SelectItem>
+              {isLocationTypesLoading && (
+                <div className="p-2 text-sm text-muted-foreground">
+                  Loading...
+                </div>
+              )}
+              {isLocationTypesError && (
+                <div className="p-2 text-sm text-red-500">
+                  Could not load location types
+                </div>
+              )}
+              {locationTypesData?.data?.locationTypes.map((type) => (
+                <SelectItem key={type.id} value={type.id}>
+                  {type.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -163,7 +228,9 @@ export function AddLocationForm({
           <Label className="mb-1 block">Status</Label>
           <Select
             value={form.watch("status")}
-            onValueChange={(v: FormValues["status"]) => form.setValue("status", v)}
+            onValueChange={(v: FormValues["status"]) =>
+              form.setValue("status", v)
+            }
           >
             <SelectTrigger className="h-10">
               <SelectValue placeholder="Select status" />
@@ -177,28 +244,26 @@ export function AddLocationForm({
       </div>
 
       {/* Parent building (only for desk/office) */}
-      {(type === "desk" || type === "office") && (
-        <div className="scroll-mt-24">
-          <Label className="mb-1 block">Parent building</Label>
-          <BuildingCombobox
-            buildings={buildings}
-            value={form.watch("parentId") ?? ""}
-            onChange={(id) => form.setValue("parentId", id)}
-            onCreate={(name) => {
-              const id = `bldg_${name.toLowerCase().replace(/\s+/g, "_")}`;
-              const newBldg = { id, name };
-              setBuildings((prev) => [...prev, newBldg]);
-              form.setValue("parentId", id);
-              toast.success("Building created", { description: `“${name}”` });
-            }}
-          />
-          {form.formState.errors.parentId && (
-            <p className="text-xs text-red-500 mt-1">
-              {form.formState.errors.parentId.message as string}
-            </p>
-          )}
-        </div>
-      )}
+      <div className="scroll-mt-24">
+        <Label className="mb-1 block">Parent building</Label>
+        <BuildingCombobox
+          buildings={buildingsData?.data?.buildings || []}
+          value={form.watch("parentId") ?? ""}
+          onChange={(id) => form.setValue("parentId", id)}
+          onCreate={async (name) => {
+            const createdBuilding = await createBuildingMutation.mutateAsync({
+              name,
+            });
+
+            form.setValue("parentId", createdBuilding.data?.id);
+          }}
+        />
+        {form.formState.errors.parentId && (
+          <p className="text-xs text-red-500 mt-1">
+            {form.formState.errors.parentId.message as string}
+          </p>
+        )}
+      </div>
 
       {/* Optional meta – shown only when toggled */}
       <div className="space-y-3">
@@ -234,7 +299,9 @@ export function AddLocationForm({
           {showFloor && (
             <div className="min-w-0">
               <div className="flex items-center justify-between">
-                <Label htmlFor="floor" className="mb-1 block">Floor</Label>
+                <Label htmlFor="floor" className="mb-1 block">
+                  Floor
+                </Label>
                 <button
                   type="button"
                   className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
@@ -259,7 +326,9 @@ export function AddLocationForm({
           {showRoom && (
             <div className="min-w-0">
               <div className="flex items-center justify-between">
-                <Label htmlFor="room" className="mb-1 block">Room</Label>
+                <Label htmlFor="room" className="mb-1 block">
+                  Room
+                </Label>
                 <button
                   type="button"
                   className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
@@ -283,7 +352,11 @@ export function AddLocationForm({
       </div>
 
       <div className="flex justify-end gap-2 pt-2 pb-2">
-        <Button type="submit" className="bg-primary text-white h-10">
+        <Button
+          type="submit"
+          className="bg-primary text-white h-10"
+          disabled={form.formState.isSubmitting}
+        >
           Save
         </Button>
       </div>
@@ -321,7 +394,11 @@ function BuildingCombobox({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" role="combobox" className="w-full justify-between h-10">
+        <Button
+          variant="outline"
+          role="combobox"
+          className="w-full justify-between h-10"
+        >
           {selected ? selected.name : "Select building..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
         </Button>
@@ -330,9 +407,15 @@ function BuildingCombobox({
       {/* Match trigger width; bump z-index to stay above Sheet overlay */}
       <PopoverContent className="z-[60] p-0 w-[--radix-popover-trigger-width] max-w-[calc(100vw-2rem)]">
         <Command shouldFilter={false}>
-          <CommandInput placeholder="Search building..." value={q} onValueChange={setQ} />
+          <CommandInput
+            placeholder="Search building..."
+            value={q}
+            onValueChange={setQ}
+          />
           <CommandList>
-            <CommandEmpty>No results.</CommandEmpty>
+            <CommandEmpty className="px-4 py-8">
+              Start typing to create a new building.
+            </CommandEmpty>
             <CommandGroup>
               {filtered.map((b) => (
                 <CommandItem

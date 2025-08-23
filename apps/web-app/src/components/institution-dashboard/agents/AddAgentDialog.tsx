@@ -1,13 +1,29 @@
 "use client";
 
-import * as React from "react";
 import { useState, useMemo } from "react";
-import { Check, ChevronsUpDown, Plus, X } from "lucide-react";
+import { z } from "zod";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Check, ChevronsUpDown, Plus } from "lucide-react";
 import { toast } from "sonner";
+import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Command,
   CommandGroup,
@@ -23,37 +39,33 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-
+import {
+  getLocations,
+  type GetLocationsResponse,
+  type LocationWithRelations,
+} from "@/server/actions/institution/query-locations";
+import {
+  getAvailableMembers,
+  GetAvailableMembersResponse,
+  addAgent,
+} from "@/server/actions/institution/query-agents";
+import { useQuery, useMutation } from "@tanstack/react-query";
+// import {}
 
 type LocationType = "building" | "desk" | "office" | "kiosk" | "zone";
 
-type Location = {
-  id: string;
-  name: string;                
-  type: LocationType;
-  building?: string;           
-  parentId?: string;            
-  status?: "active" | "inactive";
-};
+/* ------------ Form schema ------------- */
+const schema = z.object({
+  userClerkId: z.string().min(1, "Member is required"),
+  locationId: z.string().min(1, "Location is required"),
+});
 
-// Mock Data
-const seedLocations: Location[] = [
-  { id: "bldg_wilson", name: "Wilson Commons", type: "building", status: "active" },
-  { id: "desk_wilson_info", name: "Info Desk", type: "desk", building: "Wilson Commons", parentId: "bldg_wilson", status: "active" },
-
-  { id: "bldg_carlson", name: "Carlson Library", type: "building", status: "active" },
-  { id: "desk_carlson_circ", name: "Circulation Desk", type: "desk", building: "Carlson Library", parentId: "bldg_carlson", status: "active" },
-
-  { id: "office_lnf", name: "Lost & Found Office", type: "office", building: "Campus Safety", status: "active" },
-  { id: "zone_east_gate", name: "East Gate", type: "zone", status: "active" },
-  { id: "zone_bus_stop_c", name: "Bus Stop C", type: "zone", status: "active" },
-  { id: "kiosk_orient", name: "Orientation Kiosk", type: "kiosk", building: "Main Quad", status: "inactive" }, // example inactive
-];
+type FormValues = z.infer<typeof schema>;
 
 /* =========================
-   AddAgentPopover
+   AddAgentDialog
    ========================= */
-export function AddAgentPopover({
+export function AddAgentDialog({
   open,
   onOpenChange,
 }: {
@@ -61,191 +73,272 @@ export function AddAgentPopover({
   onOpenChange?: (open: boolean) => void;
 }) {
   const [internalOpen, setInternalOpen] = useState(false);
-  const isControlled = typeof open === 'boolean' && typeof onOpenChange === 'function';
+  const isControlled =
+    typeof open === "boolean" && typeof onOpenChange === "function";
 
-  // form state
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState<string>("");
-  const [locations, setLocations] = useState<Location[]>(seedLocations);
-  const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
+  const form = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      userClerkId: "",
+      locationId: "",
+    },
+  });
 
-  const canSubmit = email.trim().length > 3 && role && selectedLocationId;
+  const {
+    data: locationsData,
+    isLoading: locationsLoading,
+    isError: locationsError,
+  } = useQuery<GetLocationsResponse>({
+    queryKey: ["locations"],
+    queryFn: () => getLocations({ getAll: true }),
+  });
+  const locations = locationsData?.data?.locations ?? [];
 
-  async function handleSubmit() {
-    const payload = {
-      email,
-      roleAtLocation: role,
-      isPrimary: true,
-      locationId: selectedLocationId,
-    };
+  const {
+    data: membersData,
+    isLoading: membersLoading,
+    isError: membersError,
+  } = useQuery<GetAvailableMembersResponse>({
+    queryKey: ["available-members"],
+    queryFn: () => getAvailableMembers(),
+  });
 
-    // TODO: POST to your API
-    console.log("Submitting Add Staff", payload);
-    if (isControlled) {
-      onOpenChange?.(false);
-    } else {
-      setInternalOpen(false);
-    }
+  const members = membersData?.data?.members ?? [];
 
-    // Sonner notification
-    toast.success("Agent added successfully!", {
-      description: `Invitation sent to ${email}`,
-      duration: 4000,
-    });
+  // Add agent mutation
+  const addAgentMutation = useMutation({
+    mutationFn: async (data: FormValues) =>
+      addAgent({
+        userMemberClerkId: data.userClerkId,
+        locationId: data.locationId,
+      }),
+    onSuccess: (response) => {
+      const selectedMember = members.find(
+        (m) => m.userClerkId === response?.data?.userClerkId
+      );
+      toast.success("Agent added successfully!", {
+        description: `Invitation sent to ${selectedMember?.email || "the selected member"}`,
+        duration: 4000,
+      });
 
-    // Clear form state
-    setEmail("");
-    setRole("");
-    setSelectedLocationId(null);
-  }
+      // Reset form
+      form.reset();
+
+      // Close dialog
+      if (isControlled) {
+        onOpenChange?.(false);
+      } else {
+        setInternalOpen(false);
+      }
+    },
+    onError: (error) => {
+      toast.error("Failed to add agent", {
+        description: error.message,
+      });
+    },
+  });
+
+  const onSubmit: SubmitHandler<FormValues> = async (values) => {
+    await addAgentMutation.mutateAsync(values);
+  };
 
   return (
-    <Popover
+    <Dialog
       open={isControlled ? open : internalOpen}
       onOpenChange={isControlled ? onOpenChange! : setInternalOpen}
     >
-      <PopoverTrigger asChild>
+      <DialogTrigger asChild>
         <Button className="bg-primary text-white rounded-lg flex items-center gap-2 px-4 py-2 text-sm">
           <Plus size={16} /> Add Staff
         </Button>
-      </PopoverTrigger>
-      <PopoverContent
-        align="end"
-        className="rounded-xl w-[340px] sm:w-[420px] p-4 shadow-lg space-y-4 border bg-white"
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="text-base font-semibold">Add Staff</div>
-          <button
-            onClick={() => {
-              if (isControlled) {
-                onOpenChange?.(false);
-              } else {
-                setInternalOpen(false);
-              }
-            }}
-          >
-            <X className="h-5 w-5 text-muted-foreground hover:text-foreground" />
-          </button>
-        </div>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Add Staff</DialogTitle>
+          <DialogDescription>
+            Add a new staff member to your institution.
+          </DialogDescription>
+        </DialogHeader>
 
-        {/* Form */}
-        <div className="space-y-3">
-          <div>
-            <label className="text-sm font-medium mb-1 block">Email</label>
-            <Input
-              type="email"
-              placeholder="Enter email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full min-w-[320px] sm:min-w-[380px]" // Increased width for better usability
-            />
-          </div>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          {/* Hierarchical Empty States */}
+          {membersLoading || locationsLoading ? (
+            <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">
+              Loading...
+            </div>
+          ) : membersError || locationsError ? (
+            <div className="flex items-center justify-center py-8 text-sm text-red-500">
+              Failed to load data. Please try again.
+            </div>
+          ) : members.length === 0 ? (
+            // No members - show only members empty state
+            <div className="flex flex-col items-center justify-center py-8 text-center space-y-3">
+              <div className="text-sm text-muted-foreground">
+                No available members found
+              </div>
+              <div className="text-xs text-muted-foreground max-w-xs">
+                All organization members are already assigned as agents, or
+                there are no members in your organization yet.
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  // Close dialog and redirect to members page
+                  if (isControlled) {
+                    onOpenChange?.(false);
+                  } else {
+                    setInternalOpen(false);
+                  }
+                  window.location.href = "/institution/members";
+                }}
+              >
+                Invite Members
+              </Button>
+            </div>
+          ) : locations.length === 0 ? (
+            // Has members but no locations - show only locations empty state
+            <div className="flex flex-col items-center justify-center py-8 text-center space-y-3">
+              <div className="text-sm text-muted-foreground">
+                No locations found
+              </div>
+              <div className="text-xs text-muted-foreground max-w-xs">
+                You need to create locations before you can assign agents to
+                them.
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  // Close dialog and redirect to locations page
+                  if (isControlled) {
+                    onOpenChange?.(false);
+                  } else {
+                    setInternalOpen(false);
+                  }
+                  window.location.href = "/institution/locations";
+                }}
+              >
+                Manage Locations
+              </Button>
+            </div>
+          ) : (
+            // Both members and locations exist - show the form
+            <>
+              {/* Member Selection */}
+              <div>
+                <Label className="mb-1 block">Select Member</Label>
+                <Select
+                  value={form.watch("userClerkId")}
+                  onValueChange={(value) => form.setValue("userClerkId", value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a member to add as agent" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {members.map((member) => (
+                      <SelectItem
+                        key={member.userClerkId}
+                        value={member.userClerkId}
+                      >
+                        <div className="flex items-center gap-2">
+                          {member.avatarUrl && (
+                            <Image
+                              src={member.avatarUrl}
+                              alt={member.name || "User"}
+                              className="w-4 h-4 rounded-full"
+                              width={16}
+                              height={16}
+                            />
+                          )}
+                          <span>{member.name || member.email}</span>
+                          {member.email && member.name && (
+                            <span className="text-xs text-muted-foreground">
+                              ({member.email})
+                            </span>
+                          )}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {form.formState.errors.userClerkId && (
+                  <p className="text-xs text-red-500 mt-1">
+                    {form.formState.errors.userClerkId.message}
+                  </p>
+                )}
+              </div>
 
-          {/* Location combobox (searchable + creatable + grouped) */}
-          <div>
-            <label className="text-sm font-medium mb-1 block">Location</label>
-            <LocationCombobox
-              locations={locations}
-              value={selectedLocationId}
-              onCreate={async (draft) => {
-                // Simulate API create
-                const newId = `loc_${draft.name.toLowerCase().replace(/\s+/g, "_")}`;
-                const created: Location = {
-                  id: newId,
-                  name: draft.type === "building" ? draft.name : draft.name, // same name
-                  type: draft.type,
-                  building: draft.type === "building" ? undefined : draft.building || undefined,
-                  parentId: draft.parentId || undefined,
-                  status: "active",
-                };
-                setLocations((prev) => [...prev, created]);
-                return created;
+              {/* Location */}
+              <div>
+                <Label className="mb-1 block">Location</Label>
+                <LocationCombobox
+                  locations={locations}
+                  value={form.watch("locationId")}
+                  onChange={(id) => form.setValue("locationId", id)}
+                />
+                {form.formState.errors.locationId && (
+                  <p className="text-xs text-red-500 mt-1">
+                    {form.formState.errors.locationId.message}
+                  </p>
+                )}
+              </div>
+            </>
+          )}
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => {
+                if (isControlled) {
+                  onOpenChange?.(false);
+                } else {
+                  setInternalOpen(false);
+                }
               }}
-              onChange={(id) => setSelectedLocationId(id)}
-            />
-          </div>
-
-          {/* Role select */}
-          <div>
-            <label className="text-sm font-medium mb-1 block">Role</label>
-            <Select value={role} onValueChange={setRole}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select role" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="agent">Agent</SelectItem>
-                <SelectItem value="supervisor">Supervisor</SelectItem>
-                <SelectItem value="security">Security</SelectItem>
-                <SelectItem value="clerk">Clerk</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="flex justify-between pt-2 gap-2">
-          <Button
-            variant="ghost"
-            className="w-1/2"
-            onClick={() => {
-              if (isControlled) {
-                onOpenChange?.(false);
-              } else {
-                setInternalOpen(false);
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              className="bg-primary text-white"
+              disabled={
+                form.formState.isSubmitting ||
+                addAgentMutation.isPending ||
+                members.length === 0 ||
+                locations.length === 0
               }
-            }}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="button"
-            className="w-1/2 bg-primary text-white text-sm disabled:opacity-50"
-            disabled={!canSubmit}
-            onClick={handleSubmit}
-          >
-            + Add Staff
-          </Button>
-        </div>
-      </PopoverContent>
-    </Popover>
+            >
+              {addAgentMutation.isPending ? "Adding..." : "+ Add Staff"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }
 
 /* =========================
    LocationCombobox
    - Searchable + Grouped by type
-   - Creatable inline with type & building
    ========================= */
-type CreateDraft = {
-  name: string;
-  type: LocationType;
-  building?: string;
-  parentId?: string;
-};
 
 function LocationCombobox({
   locations,
   value,
   onChange,
-  onCreate,
 }: {
-  locations: Location[];
-  value: string | null;
+  locations: LocationWithRelations[];
+  value: string;
   onChange: (value: string) => void;
-  onCreate: (draft: CreateDraft) => Promise<Location>;
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
 
-  // mini create panel state
-  const [createOpen, setCreateOpen] = useState(false);
-  const [draftType, setDraftType] = useState<LocationType>("desk");
-  const [draftName, setDraftName] = useState("");
-  const [draftBuilding, setDraftBuilding] = useState<string>("");
-  const [draftParentId, setDraftParentId] = useState<string>("");
-
-  const selected = useMemo(
+  const selected = useMemo<LocationWithRelations | null>(
     () => locations.find((l) => l.id === value) ?? null,
     [locations, value]
   );
@@ -256,51 +349,41 @@ function LocationCombobox({
     if (!q) return locations;
     return locations.filter((l) => {
       const nameHit = l.name.toLowerCase().includes(q);
-      const buildingHit = (l.building || "").toLowerCase().includes(q);
+      const buildingHit = (l.building?.name || "").toLowerCase().includes(q);
       return nameHit || buildingHit;
     });
   }, [locations, query]);
 
-  const byType: Record<LocationType, Location[]> = useMemo(() => {
-    const types: LocationType[] = ["building", "desk", "office", "kiosk", "zone"];
-    const map = Object.fromEntries(types.map((t) => [t, [] as Location[]])) as Record<LocationType, Location[]>;
-    for (const l of filtered) map[l.type].push(l);
+  const byType: Record<LocationType, LocationWithRelations[]> = useMemo(() => {
+    const types: LocationType[] = [
+      "building",
+      "desk",
+      "office",
+      "kiosk",
+      "zone",
+    ];
+
+    // Create a properly typed map for grouping locations by type
+    const map: Record<LocationType, LocationWithRelations[]> = types.reduce(
+      (acc, t) => {
+        acc[t] = [];
+        return acc;
+      },
+      {} as Record<LocationType, LocationWithRelations[]>
+    );
+
+    for (const l of filtered) {
+      const typeCode = (l.type?.code as LocationType) || "desk";
+      if (map[typeCode]) {
+        map[typeCode].push(l);
+      }
+    }
+
     return map;
   }, [filtered]);
 
-  const canCreate = query.trim().length > 0 && !locations.some((l) =>
-    (l.name.toLowerCase() === query.trim().toLowerCase()) &&
-    // if desk/office and user typed a building prefix, we still let them create
-    true
-  );
-
-  async function handleCreateSave() {
-    const draft: CreateDraft = {
-      name: draftName || query.trim(),
-      type: draftType,
-      building: draftType === "building" ? undefined : draftBuilding || undefined,
-      parentId: draftParentId || undefined,
-    };
-    const created = await onCreate(draft);
-    // Show toast for location creation
-    toast.success(`Location "${created.name}" created successfully!`);
-    // select it
-    onChange(created.id);
-    // reset and close
-    setCreateOpen(false);
-    setOpen(false);
-    setQuery("");
-    setDraftName("");
-    setDraftBuilding("");
-    setDraftParentId("");
-    setDraftType("desk");
-  }
-
-  // Buildings list for parent selection
-  const buildings = locations.filter((l) => l.type === "building");
-
   return (
-    <Popover open={open} onOpenChange={(o) => { setOpen(o); if (!o) setCreateOpen(false); }}>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           type="button"
@@ -310,7 +393,9 @@ function LocationCombobox({
           className="w-full justify-between"
         >
           {selected
-            ? (selected.building ? `${selected.building} — ${selected.name}` : selected.name)
+            ? selected.building
+              ? `${selected.building.name} — ${selected.name}`
+              : selected.name
             : "Select a location..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -328,7 +413,9 @@ function LocationCombobox({
             <CommandEmpty>No locations found.</CommandEmpty>
 
             {/* Grouped results by type */}
-            {(["building","desk","office","kiosk","zone"] as LocationType[]).map((t) => {
+            {(
+              ["building", "desk", "office", "kiosk", "zone"] as LocationType[]
+            ).map((t) => {
               const items = byType[t];
               if (!items.length) return null;
               return (
@@ -344,11 +431,15 @@ function LocationCombobox({
                       }}
                     >
                       <div className="flex w-full items-center gap-2">
-                        <span className={`truncate ${l.status === "inactive" ? "opacity-50" : ""}`}>
-                          {l.building ? `${l.building} — ${l.name}` : l.name}
+                        <span
+                          className={`truncate ${l.status === "inactive" ? "opacity-50" : ""}`}
+                        >
+                          {l.building
+                            ? `${l.building.name} — ${l.name}`
+                            : l.name}
                         </span>
                         <span className="ml-auto text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">
-                          {t}
+                          {l.type?.code || t}
                         </span>
                       </div>
                       {value === l.id && <Check className="ml-2 h-4 w-4" />}
@@ -357,108 +448,9 @@ function LocationCombobox({
                 </CommandGroup>
               );
             })}
-
-            {/* Creatable footer */}
-            {canCreate && !createOpen && (
-              <CommandGroup>
-                <CommandItem
-                  className="text-primary"
-                  onSelect={() => {
-                    setDraftName(query.trim());
-                    setCreateOpen(true);
-                  }}
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create “{query.trim()}”
-                </CommandItem>
-              </CommandGroup>
-            )}
           </CommandList>
         </Command>
-
-        {/* Inline Create mini-form */}
-        {createOpen && (
-          <div className="border-t p-3 space-y-2">
-            <div className="text-sm font-medium">Create new location</div>
-
-            <div className="space-y-1">
-              <label className="text-xs">Name</label>
-              <Input value={draftName} onChange={(e) => setDraftName(e.target.value)} placeholder="e.g. Info Desk" />
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-xs">Type</label>
-              <Select value={draftType} onValueChange={(v) => setDraftType(v as LocationType)}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="building">Building</SelectItem>
-                  <SelectItem value="desk">Desk</SelectItem>
-                  <SelectItem value="office">Office</SelectItem>
-                  <SelectItem value="kiosk">Kiosk</SelectItem>
-                  <SelectItem value="zone">Zone</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Building/parent fields only if not a building */}
-            {draftType !== "building" && (
-              <>
-                <div className="space-y-1">
-                  <label className="text-xs">Building (text label)</label>
-                  <Input
-                    value={draftBuilding}
-                    onChange={(e) => setDraftBuilding(e.target.value)}
-                    placeholder="e.g. Wilson Commons"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs">Parent Building (optional link)</label>
-                  <Select
-                    value={draftParentId}
-                    onValueChange={setDraftParentId}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select parent building (optional)" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">None</SelectItem>
-                      {buildings.map((b) => (
-                        <SelectItem value={b.id} key={b.id}>
-                          {b.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </>
-            )}
-
-            <div className="flex gap-2 pt-1">
-              <Button
-                variant="ghost"
-                className="w-1/2"
-                onClick={() => setCreateOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                className="w-1/2 bg-primary text-white"
-                disabled={!draftName.trim()}
-                onClick={handleCreateSave}
-              >
-                Save
-              </Button>
-            </div>
-          </div>
-        )}
       </PopoverContent>
     </Popover>
   );
 }
-// function setOpen(_arg0: boolean) {
-//   throw new Error("Function not implemented.");
-// }
-

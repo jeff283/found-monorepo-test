@@ -15,7 +15,7 @@ import {
 import { getInstitutionStatus } from "@/api/lib/utils/insitution-status-helper";
 import { getDomainCacheKey } from "@/api/lib/utils/domain-cache-key";
 import { db } from "@/api/db/drizzle";
-import { tenantSchema } from "@/web-app/db/drizzle/schema/tenant";
+import { tenant } from "@/web-app/db/drizzle/schema/tenant";
 
 const userInstitutionRoutes = new Hono<{ Bindings: Env }>();
 
@@ -463,7 +463,7 @@ userInstitutionRoutes.post("/clerk-details", async (c) => {
     console.log("ROUTE(/clerk-details): Cached email domain", emailDomain);
 
     // Add Org to db
-    const dbResult = await db.insert(tenantSchema).values({
+    const dbResult = await db.insert(tenant).values({
       name: draftData?.institutionName || "",
       clerkId: validatedData.clerkOrgId,
       emailDomain,

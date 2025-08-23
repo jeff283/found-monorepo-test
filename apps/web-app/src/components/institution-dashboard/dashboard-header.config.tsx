@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   SearchPopover,
@@ -7,7 +7,14 @@ import {
   ProfileDropdown,
 } from "@/components/institution-dashboard/navbar-popovers";
 import { MessagesSheet } from "@/components/navbar-popovers/messages-sheet";
-import { Home, ClipboardList, Users, MapPin, BarChart3, Shield } from "lucide-react";
+import {
+  Home,
+  ClipboardList,
+  Users,
+  MapPin,
+  BarChart3,
+  UserCheck,
+} from "lucide-react";
 // import Image from "next/image";
 import type { NavItem, User } from "@/components/common/dashboard-header";
 
@@ -20,11 +27,16 @@ export const defaultUser: User = {
 
 export const defaultNavItems: NavItem[] = [
   { icon: Home, label: "Dashboard", href: "/institution/dashboard" },
-  { icon: ClipboardList, label: "Found items", href: "/institution/found-items" },
-  { icon: Users, label: "Agents", href: "/institution/agents" },
+  {
+    icon: ClipboardList,
+    label: "Found items",
+    href: "/institution/found-items",
+  },
+  { icon: UserCheck, label: "Agents", href: "/institution/agents" },
   { icon: MapPin, label: "Locations", href: "/institution/locations" },
+  { icon: Users, label: "Members", href: "/institution/members" },
   { icon: BarChart3, label: "Reports", href: "/institution/reports" },
-  { icon: Shield, label: "Roles", href: "/institution/roles" },
+  // { icon: Shield, label: "Roles", href: "/institution/roles" },
 ];
 
 /**

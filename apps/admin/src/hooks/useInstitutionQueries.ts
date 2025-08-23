@@ -50,7 +50,10 @@ export function useInstitutionApplications(
       const data: ApiResponse<ApplicationsResponse> = await response.json();
 
       if (!data.success || !data.data) {
-        throw new Error(data.error || "Failed to fetch applications");
+        const errorMessage = Array.isArray(data.error)
+          ? data.error.join(", ")
+          : data.error || "Failed to fetch applications";
+        throw new Error(errorMessage);
       }
 
       return data.data;
@@ -70,7 +73,10 @@ export function useInstitutionMetrics() {
       const data: ApiResponse<InstitutionMetricsData> = await response.json();
 
       if (!data.success || !data.data) {
-        throw new Error(data.error || "Failed to fetch metrics");
+        const errorMessage = Array.isArray(data.error)
+          ? data.error.join(", ")
+          : data.error || "Failed to fetch metrics";
+        throw new Error(errorMessage);
       }
 
       return data.data;
@@ -92,7 +98,10 @@ export function useInstitutionApplicationDetail(userId: string) {
       const data: ApiResponse<InstitutionDraftData> = await response.json();
 
       if (!data.success || !data.data) {
-        throw new Error(data.error || "Failed to fetch application");
+        const errorMessage = Array.isArray(data.error)
+          ? data.error.join(", ")
+          : data.error || "Failed to fetch application";
+        throw new Error(errorMessage);
       }
 
       return data.data;
@@ -114,7 +123,10 @@ export function useInstitutionApplication(userId: string) {
       const data: ApiResponse<InstitutionApplication> = await response.json();
 
       if (!data.success || !data.data) {
-        throw new Error(data.error || "Failed to fetch application");
+        const errorMessage = Array.isArray(data.error)
+          ? data.error.join(", ")
+          : data.error || "Failed to fetch application";
+        throw new Error(errorMessage);
       }
 
       return data.data;
@@ -163,7 +175,10 @@ export function useApplicationAction() {
       const data: ApiResponse = await response.json();
 
       if (!data.success) {
-        throw new Error(data.error || `Failed to ${action} application`);
+        const errorMessage = Array.isArray(data.error)
+          ? data.error.join(", ")
+          : data.error || `Failed to ${action} application`;
+        throw new Error(errorMessage);
       }
 
       return data;
@@ -212,7 +227,10 @@ export function useBulkApplicationAction() {
       const data: ApiResponse = await response.json();
 
       if (!data.success) {
-        throw new Error(data.error || `Failed to ${action} applications`);
+        const errorMessage = Array.isArray(data.error)
+          ? data.error.join(", ")
+          : data.error || `Failed to ${action} applications`;
+        throw new Error(errorMessage);
       }
 
       return data;
