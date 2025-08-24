@@ -2,7 +2,7 @@
 import { db } from "@/db/drizzle";
 import z from "zod";
 import { ApiResponse } from "@/api/lib/types";
-import { eq, desc, and, count, sql } from "drizzle-orm";
+import { eq, desc, and, sql } from "drizzle-orm";
 import {
   requireInstitutionAuth,
   handleAuthError,
@@ -51,33 +51,11 @@ export async function getAgents(
 
     // Build where conditions
     const whereConditions = [eq(agent.tenantClerkId, orgId)];
-
     if (validatedOptions.locationId) {
       whereConditions.push(eq(agent.locationId, validatedOptions.locationId));
     }
 
-    // Optional date filters example
-    // if (validatedOptions.createdAfter) {
-    //   whereConditions.push(gte(agent.createdAt, validatedOptions.createdAfter));
-    // }
-    // if (validatedOptions.createdBefore) {
-    //   whereConditions.push(lte(agent.createdAt, validatedOptions.createdBefore));
-    // }
-
-    // Count query
-    const [{ count: agentsCount }] = await db
-      .select({ count: count() })
-      .from(agent)
-      .where(and(...whereConditions));
-
-    if (Number(agentsCount) === 0) {
-      return {
-        success: true,
-        data: { agents: [], total: 0 },
-      };
-    }
-
-    // Base query
+    // Single query: fetch agents + total count
     const baseQuery = db
       .select({
         id: agent.id,
@@ -86,6 +64,7 @@ export async function getAgents(
         location: location.name,
         createdAt: agent.createdAt,
         updatedAt: agent.updatedAt,
+        total: sql<number>`count(*) over()`, // window function
       })
       .from(agent)
       .where(and(...whereConditions))
@@ -104,6 +83,13 @@ export async function getAgents(
           .limit(validatedOptions.limit)
           .offset(validatedOptions.offset);
 
+    if (agents.length === 0) {
+      return {
+        success: true,
+        data: { agents: [], total: 0 },
+      };
+    }
+
     // Clerk lookup
     const userIds = agents.map((a) => a.userClerkId);
     const users = await (
@@ -116,11 +102,16 @@ export async function getAgents(
       const user = users.data.find((u) => u.id === a.userClerkId);
 
       return {
-        ...a,
+        id: a.id,
+        userClerkId: a.userClerkId,
+        locationId: a.locationId,
+        location: a.location,
+        createdAt: a.createdAt,
+        updatedAt: a.updatedAt,
         email: user?.primaryEmailAddress?.emailAddress || null,
         name: user?.fullName || null,
         avatarUrl: user?.imageUrl || null,
-        foundItems: 0, // TODO: replace with actual count of items after linking the items table
+        foundItems: 0, // placeholder
       };
     });
 
@@ -128,21 +119,17 @@ export async function getAgents(
       success: true,
       data: {
         agents: enrichedAgents,
-        total: Number(agentsCount),
+        total: Number(agents[0].total), // same for all rows
       },
     };
   } catch (error) {
     console.error("Error retrieving agents:", error);
 
     const zodError = parseZodError(error);
-    if (zodError) {
-      return zodError;
-    }
+    if (zodError) return zodError;
 
     const authError = handleAuthError(error);
-    if (authError) {
-      return authError;
-    }
+    if (authError) return authError;
 
     return {
       success: false,
