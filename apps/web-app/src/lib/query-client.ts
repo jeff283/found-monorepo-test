@@ -7,6 +7,10 @@ export const queryClient = new QueryClient({
       gcTime: 20 * 60 * 1000, // 20 minutes (was cacheTime)
       refetchOnWindowFocus: false,
       retry: (failureCount, error) => {
+        console.log("REACT Query: Retrying request...", {
+          failureCount,
+          error,
+        });
         // Don't retry on 4xx errors
         if (error instanceof Error && "status" in error) {
           const status = (error as Error & { status?: number }).status;
